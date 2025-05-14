@@ -5698,6 +5698,8 @@ __metadata:
     typescript-eslint: "npm:^8.32.0"
     update-browserslist-db: "npm:^1.1.2"
     utility-types: "npm:^3.11.0"
+    vis-data: "npm:^7.1.9"
+    vis-network: "npm:^9.1.10"
     yaml: "npm:^2.7.1"
   languageName: unknown
   linkType: soft
@@ -16272,6 +16274,30 @@ __metadata:
     "@types/unist": "npm:^3.0.0"
     vfile-message: "npm:^4.0.0"
   checksum: 10c0/e5d9eb4810623f23758cfc2205323e33552fb5972e5c2e6587babe08fe4d24859866277404fb9e2a20afb71013860d96ec806cb257536ae463c87d70022ab9ef
+  languageName: node
+  linkType: hard
+
+"vis-data@npm:^7.1.9":
+  version: 7.1.9
+  resolution: "vis-data@npm:7.1.9"
+  peerDependencies:
+    uuid: ^3.4.0 || ^7.0.0 || ^8.0.0 || ^9.0.0
+    vis-util: ^5.0.1
+  checksum: 10c0/2fce50e41862133e4fcdc92d216755b544936288a8586fc2f0afdc8b586ee75acb029e3fa9bbbb48a91e4c35ebc375bdba213e836926564f899ad80e0981d304
+  languageName: node
+  linkType: hard
+
+"vis-network@npm:^9.1.10":
+  version: 9.1.10
+  resolution: "vis-network@npm:9.1.10"
+  peerDependencies:
+    "@egjs/hammerjs": ^2.0.0
+    component-emitter: ^1.3.0
+    keycharm: ^0.2.0 || ^0.3.0 || ^0.4.0
+    uuid: ^3.4.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
+    vis-data: ^6.3.0 || ^7.0.0
+    vis-util: ^5.0.1
+  checksum: 10c0/89e514c95ca5db96e33056c28d0abaa65754731d4b73bb02bdf57ec88cc039e430068f410a1bab80415c719051d8827c9eed6d8ef758bd1f4805a9a06f2502b7
   languageName: node
   linkType: hard
 
