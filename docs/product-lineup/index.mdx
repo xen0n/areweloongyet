@@ -1,0 +1,114 @@
+---
+sidebar_position: 1
+---
+
+import ProductChart from '@site/src/components/ProductChart';
+
+# 龙架构产品谱系
+
+本文档整理了龙架构 CPU 产品线的演进历史与技术特点，为您提供对龙芯处理器发展全貌的清晰认识。
+
+## 产品演进图谱
+
+下面的交互式图表展示了龙芯处理器系列从 2021 年以来的演进关系，您可以点击各个节点查看详细信息。
+
+<ProductChart
+  nodes={[
+    // 5000 Series (2021) - GS464V
+    { id: 1, label: '3A5000\n(2021)', group: 'gs464v', title: '四核心桌面处理器, 2.3-2.5 GHz' },
+    { id: 2, label: '3B5000\n(2021)', group: 'gs464v', title: '四核心服务器处理器, 2.3-2.5 GHz' },
+    { id: 3, label: '3C5000L\n(2021)', group: 'gs464v', title: '16核心服务器处理器, 2.2 GHz' },
+    { id: 4, label: '3C5000L-LL\n(2021)', group: 'gs464v', title: '低功耗16核心服务器处理器, 2.0 GHz' },
+
+    // 6000 Series (2023-2024) - LA664
+    { id: 5, label: '3A6000\n(2023)', group: 'la664', title: '四核心桌面处理器, 2.0-2.5 GHz' },
+    { id: 6, label: '3C6000\n(2024)', group: 'la664', title: '16核心服务器处理器, 1.8-2.3 GHz' },
+    { id: 7, label: '3D6000\n(2024)', group: 'la664', title: '32核心服务器处理器, 1.6-2.1 GHz' },
+    { id: 8, label: '3E6000\n(2024)', group: 'la664', title: '64核心服务器处理器, 1.6-2.0 GHz' },
+
+    // 6600 and 7000 Series (2025) - LA864
+    { id: 9, label: '3B6600\n(2025)', group: 'la864', title: '8核心高性能桌面处理器, 3.0 GHz, 集成LG200显卡' },
+    { id: 10, label: '3A7000\n(2025)', group: 'la864', title: '8核心桌面处理器' },
+    { id: 11, label: '3B7000\n(2025)', group: 'la864', title: '16核心高性能桌面处理器, 3.5 GHz' },
+    { id: 12, label: '3C7000\n(2025)', group: 'la864', title: '16核心服务器处理器' },
+    { id: 13, label: '3D7000\n(2025)', group: 'la864', title: '32核心服务器处理器' },
+    { id: 14, label: '3E7000\n(2025)', group: 'la864', title: '64核心高端服务器处理器' },
+  ]}
+  edges={[
+    // 5000 to 6000 evolution
+    { id: 101, from: 1, to: 5, arrows: 'to', dashes: true, title: '架构升级: GS464V → LA664' },
+    { id: 102, from: 2, to: 5, arrows: 'to', dashes: true },
+    { id: 103, from: 3, to: 6, arrows: 'to', dashes: true },
+    { id: 104, from: 4, to: 6, arrows: 'to', dashes: true },
+
+    // 6000 server processor relationships
+    { id: 105, from: 6, to: 7, arrows: 'to', dashes: false, title: '双芯片设计' },
+    { id: 106, from: 7, to: 8, arrows: 'to', dashes: false, title: '四芯片设计' },
+
+    // 6000 to 7000 evolution
+    { id: 107, from: 5, to: 10, arrows: 'to', dashes: true, title: '架构升级: LA664 → LA864' },
+    { id: 108, from: 5, to: 9, arrows: 'to', dashes: true, title: '架构升级: LA664 → LA864 + LG200' },
+    { id: 109, from: 6, to: 12, arrows: 'to', dashes: true },
+    { id: 110, from: 7, to: 13, arrows: 'to', dashes: true },
+    { id: 111, from: 8, to: 14, arrows: 'to', dashes: true },
+
+    // 7000 series relationships
+    { id: 112, from: 10, to: 11, arrows: 'to', dashes: false, title: '高性能版本' },
+    { id: 113, from: 12, to: 13, arrows: 'to', dashes: false, title: '双芯片设计' },
+    { id: 114, from: 13, to: 14, arrows: 'to', dashes: false, title: '四芯片设计' },
+  ]}
+  pageMap={{
+    1: '/docs/product-lineup/3a5000',
+    2: '/docs/product-lineup/3a5000',
+    3: '/docs/product-lineup/3c5000l',
+    4: '/docs/product-lineup/3c5000l',
+    5: '/docs/product-lineup/3a6000',
+    6: '/docs/product-lineup/6000-server',
+    7: '/docs/product-lineup/6000-server',
+    8: '/docs/product-lineup/6000-server',
+    9: '/docs/product-lineup/3b6600',
+    10: '/docs/product-lineup/7000-series',
+    11: '/docs/product-lineup/7000-series',
+    12: '/docs/product-lineup/7000-series',
+    13: '/docs/product-lineup/7000-series',
+    14: '/docs/product-lineup/7000-series',
+  }}
+  groupColors={{
+    gs464v: { color: '#97C2FC', label: 'GS464V 微架构 (2021)' },
+    la664: { color: '#FB7E81', label: 'LA664 微架构 (2023-2024)' },
+    la864: { color: '#7BE141', label: 'LA864 微架构 (2025)' }
+  }}
+/>
+
+## 产品系列概述
+
+从 2021 年开始，龙芯正式推出采用自主指令集架构（LoongArch）的处理器产品，完成了从 MIPS 兼容架构到完全自主架构的转变。
+
+### 3A/3B/3C/3D/3E 产品线定位
+
+龙芯处理器的命名遵循特定规则，不同系列有各自的市场定位：
+
+- **3A 系列**：面向桌面和工作站市场的主流处理器
+- **3B 系列**：高性能桌面和服务器处理器
+- **3C 系列**：面向服务器市场的多核处理器
+- **3D 系列**：高密度服务器和云计算处理器
+- **3E 系列**：顶级服务器处理器，具有最大核心数
+
+### 工艺与架构演进
+
+龙芯处理器的架构经历了几代演进：
+
+- **GS464V**（2021年）：首代 LoongArch 微架构，12/14nm 工艺
+- **LA664**（2023-2024年）：第二代 LoongArch 微架构，12nm 工艺
+- **LA864**（2025年）：第三代 LoongArch 微架构，7nm 工艺，性能大幅提升
+
+## 详细产品介绍
+
+点击以下链接查看各产品详细信息：
+
+- [龙芯 3A5000/3B5000](3a5000.md) - 2021年推出的首款 LoongArch 桌面处理器
+- [龙芯 3C5000L/3C5000L-LL](3c5000l.md) - 2021年推出的首款 LoongArch 服务器处理器
+- [龙芯 3A6000](3a6000.md) - 2023年推出的第二代 LoongArch 桌面处理器
+- [龙芯 3C/3D/3E6000 系列](6000-server.md) - 2024年推出的第二代服务器处理器系列
+- [龙芯 3B6600](3b6600.md) - 2025年推出的高性能桌面处理器
+- [龙芯 7000 系列](7000-series.md) - 2025年推出的第三代 LoongArch 处理器系列
