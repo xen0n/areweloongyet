@@ -4,7 +4,6 @@ title: 每周一龙：第 152 期
 authors: [jokerm13]
 date: 2026-05-18T02:00:00+08:00  # TODO: change to actual time in the finishing commit
 tags: [每周一龙]
-draft: true  # TODO: remove in the finishing commit
 ---
 
 每周（尽量）为大家报道 LoongArch 社区最前线的第一手新鲜资讯！
@@ -22,9 +21,9 @@ draft: true  # TODO: remove in the finishing commit
 
 ### Linux {/* #linux */}
 
-Bibo Mao [移除了](https://lore.kernel.org/loongarch/20260509040159.338866-1-maobibo@loongson.cn/T/#u)龙架构 KVM 软件定时器 (swtimer) 过期时的定时器中断注入。KVM 使用 swtimer 来模拟硬件定时器中断，当 swtimer 到期时会调用 `kvm_swtimer_wakeup()` 函数，该函数同时执行了 `kvm_queue_irq(vcpu, INT_TI)`（注入定时器中断）和 `rcuwait_wake_up(&vcpu->wait)`（唤醒可能处于空闲状态的 vCPU），因为该定时器中断会在 vCPU 唤醒后的 `kvm_restore_timer` 路径中正确注入，此处调用 `kvm_queue_irq` 是冗余的。在 5 月 13 日，Bibo Mao [提交了](https://lore.kernel.org/loongarch/20260509040159.338866-1-maobibo@loongson.cn/T/#u)此系列的 v2 补丁，使用了通用 KVM API `kvm_vcpu_wake_up(vcpu)` 替换 `rcuwait_wake_up(&vcpu->wait)`。
+Bibo Mao [提交了](https://lore.kernel.org/loongarch/20260509040159.338866-1-maobibo@loongson.cn/T/#u)关于 KVM 定时器中断注入的 v2 补丁，使用了通用 KVM API `kvm_vcpu_wake_up(vcpu)` 替换 `rcuwait_wake_up(&vcpu->wait)`。
 
-Bibo Mao [优化了](https://lore.kernel.org/loongarch/96f15a3c-5401-d654-6a4a-0a5d41a1bafa@loongson.cn/T/#t) KVM 中断注入。通过将 msgint 特性检查移出热路径、使用现有宏定义 (`CSR_GINTC`、`CSR_GSTAT`\) 中断位掩码替换硬编码常量、使用位掩码批量处理中断清除/注入、以及新增 `kvm_vcpu_sync_intr()` 简化状态同步，提升了龙架构 KVM 中断处理性能，简化了 VM 迁移时的中断状态获取逻辑。2026 年 5 月 14 日，Bibo Mao 提交了此系列的 v2 补丁，[新增了](https://lore.kernel.org/loongarch/20260514062824.1378373-1-maobibo@loongson.cn/T/#t)中断号和 CSR 写入的有效性检查，并将中断清除与注入的批量化处理合并为一个补丁。
+Bibo Mao 提交了优化 KVM 中断注入的 v2 补丁，[新增了](https://lore.kernel.org/loongarch/20260514062824.1378373-1-maobibo@loongson.cn/T/#t)中断号和 CSR 写入的有效性检查，并将中断清除与注入的批量化处理合并为一个补丁。
 
 > 此系列的前情提要：WANG Rui [解决了](https://lore.kernel.org/loongarch/20260426120231.532644-1-r@hev.cc/T/#t)启用 KASLR 时内核映像与 initrd 之间的重叠问题；随后，WANG Rui [提交了](https://lore.kernel.org/loongarch/20260428040159.1065822-1-r@hev.cc/T/#me0cd42adeb0d4830b0d990d07c6b5e63b446b801) v2 版本（基于 RFC v1），删除了 `rdtime_h/1` 补丁，改用 `random_get_entropy()`；增加了对齐、最小偏移等安全性改进。2026 年 4 月 29 日，WANG Rui [提交了](https://lore.kernel.org/loongarch/7efff830-06c6-44d8-a613-f230253c014e@app.fastmail.com/)此系列的 v3 补丁，新增了 initrd 重叠检查，恢复了 Kconfig range 的原有范围，并根据 v2 反馈优化了函数命名和类型；同日，WANG Rui [提交了](https://lore.kernel.org/loongarch/20260429120300.1786210-1-r@hev.cc/T/#t)此系列的 v4 补丁，根据 Huacai Chen 的反馈重命名函数并修正变量类型。
 
@@ -34,13 +33,13 @@ Jinjie Ruan 在为 arm64/riscv 架构添加 crashkernel CMA 预留添加支持�
 
 Tianyang Zhang 基于 2026 年 2 月 3 日[提交](https://lore.kernel.org/loongarch/20260203124522.2288900-1-zhangtianyang@loongson.cn/)的此系列 v11 补丁，[提交了](https://lore.kernel.org/loongarch/CAAhV-H6qd-frORWPV=AQ7xWNk7mSrgSaNZdtyFYwaE8bw8gCqg@mail.gmail.com/T/#mbcac1293be7621f17628e77c550dc4f0990f008a)关于中断重定向支持的 v12 补丁，添加了高级扩展 IRQ 模型的描述、通过 REDIRECT 控制器将 MSI 中断动态映射到 CPU/中断向量，已获得 Huacai Chen 的 `Acked-by`。
 
-Tiezhu Yang [修复了](https://lore.kernel.org/loongarch/20260512082029.2131-1-yangtiezhu@loongson.cn/T/#t)龙架构在高负载追踪下 ftrace 和 kprobes 的四个问题：修复任务迁移后过时的 pre-CPU kprobe 状态未被清除，导致 CPU 永久处于忙碌状态，在 `kprobe_ftrace_handler()` 中添加了自我重置机制；在 SMP 系统上，kprobe 处理程序偶尔在某些 CPU 核心上失败，使用 `larch_insn_text_copy()` 替代直接内存写入；原始代码直接使用原始内存存储将指令分配给缓冲区，缺少指令屏障同步，使用 `larch_insn_patch_text()` 替代直接赋值，修复了单步执行槽准备；修复 `KPROBE_HIT_SS` 和 `KPROBE_REENTER` 两种致命不可恢复递归的处理。作者于 2026 年 5 月 15 日[说明](https://lore.kernel.org/loongarch/CAAhV-H7aR3NBpTk8Nbg0bphuXoDXa+xjo=bMLbrApm-SwvJYOw@mail.gmail.com/T/#t)，放弃补丁 #1，保留补丁 ＃2 和 #4，同时将修改补丁 #3，移除关于“原子性”的介绍。
+Tiezhu Yang [修复了](https://lore.kernel.org/loongarch/20260512082029.2131-1-yangtiezhu@loongson.cn/T/#t)龙架构在高负载追踪下 ftrace 和 kprobes 的四个问题：修复任务迁移后过时的 pre-CPU kprobe 状态未被清除，导致 CPU 永久处于忙碌状态，在 `kprobe_ftrace_handler()` 中添加了自我重置机制；在 SMP 系统上，kprobe 处理程序偶尔在某些 CPU 核心上失败，使用 `larch_insn_text_copy()` 替代直接内存写入；原始代码直接使用原始内存存储将指令分配给缓冲区，缺少指令屏障同步，使用 `larch_insn_patch_text()` 替代直接赋值，修复了单步执行槽准备；修复 `KPROBE_HIT_SS` 和 `KPROBE_REENTER` 两种致命不可恢复递归的处理。作者于 2026 年 5 月 15 日[说明](https://lore.kernel.org/loongarch/CAAhV-H7aR3NBpTk8Nbg0bphuXoDXa+xjo=bMLbrApm-SwvJYOw@mail.gmail.com/T/#t)，放弃补丁 #1，保留补丁 ＃2 和 #4，同时将修改补丁 #3，移除关于「原子性」的介绍。
 
 Hongliang Wang 基于其 v2 补丁（为 ls2x I2C 驱动[添加了](https://lore.kernel.org/loongarch/84c37ac1-3a9c-b0d2-f86a-90712b45b806@loongson.cn/T/#t) `clock` 属性），[发送了](https://lore.kernel.org/loongarch/20260509082837.28778-1-wanghongliang@loongson.cn/T/#u) v3 补丁，根据 Huacai Chen 的审阅意见简化了 I2C 驱动中时钟解析的实现，移除了冗余的 `chip_data` 结构体，将 `factor` 改名为 `div`，优化了条件判断逻辑。
 
 Huacai Chen [修复了](https://lore.kernel.org/loongarch/20260517092432.1025008-1-chenhuacai@loongson.cn/T/#u)龙架构内存热移除代码中因上游接口变更（上游内核提交：`feee6b2989165631b` ("mm/memory\_hotplug: shrink zones when offlining memory") 修改了 `__remove_pages()` 函数的接口，移除了 `zone` 参数）产生的未使用变量的编译警告。
 
-于 2026 年 4 月 12 日 Xi Ruoyao 提交的关于龙芯 3C6000 系列早期步进 PCIe 桥接器的 LinkCap2 报告错误的 v8 补丁，目前已由 Manivannan Sadhasivam 合并。此系列补丁耗时 9 个月时间，终于迎来了[合并](https://lore.kernel.org/loongarch/177858581215.17835.9314837252988039944.b4-ty@b4/T/#t)，3C6000 平台的 PCIe 链路速度控制恢复正常，不是通过寄存器上报的“支持速率”只有 2.5 GT/s (PCIe 1.0)，而是支持 16 GT/s (PCIe 4.0)。
+2026 年 4 月 12 日，Xi Ruoyao [提交了](https://lore.kernel.org/loongarch/177858581215.17835.9314837252988039944.b4-ty@b4/T/#t)龙芯 3C6000 系列早期步进的 PCIe 桥错误报告 LnkCap2 的修复补丁第 8 版，已由 Manivannan Sadhasivam 合并。从第一版补丁发出至今，历时 9 个月。受影响的 3C6000 平台原本通过寄存器上报的 PCIe 链路速度仅 2.5 GT/s (PCIe 1.0)，而实际支持到 16 GT/s (PCIe 4.0)。
 
 ### 工具链 {/* #toolchain */}
 
@@ -66,25 +65,42 @@ Lulu Cheng [报告了](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=125305)龙�
 
 #### Zig {/* #zig */}
 
-[cataggar](https://github.com/cataggar) [完成了](https://github.com/ctaggart/zig/pull/481)龙架构 64 位软浮点 (loongarch64-sf) 和 s390x 架构的浮点环境控制 (fenv) 实现从 C 语言 (musl libc) 迁移到纯 Zig，完成了 Issue #359。
+[cataggar](https://github.com/cataggar) 将龙架构 64 位软浮点 (`loongarch64-sf`) 和 s390x 架构的浮点环境控制 (fenv) 实现从 C 语言 (musl libc) [迁移到了](https://github.com/ctaggart/zig/pull/481)纯 Zig。
 
-[cataggar](https://github.com/cataggar) 将 `sigaction` 信号处理实现从 musl C [迁移到](https://github.com/ctaggart/zig/pull/552) Zig。
+[cataggar](https://github.com/cataggar) 将 `sigaction` 信号处理实现从 musl C [迁移到了](https://github.com/ctaggart/zig/pull/552) Zig。
 
 [cataggar](https://github.com/cataggar) [报告了](https://github.com/ctaggart/zig/issues/495)使用 Zig 交叉编译到龙架构等多个目标时在 LLVM 代码生成阶段出现段错误的问题，原因是 LLVM 后端在同一编译单元中定义并导出 `__stack_chk_fail` 会导致崩溃；已通过内联汇编 + 别名的方式绕过。
 
 #### Rust {/* #rust */}
 
-heiher 优化了 stdarch 项目中的 SIMD 函数，将龙架构下的 vpickve2gr.d / vpickve2gr.w 等 SIMD 指令的底层实现，从原有的手写汇编或内联函数，迁移到使用 instrinsics::simd 统一接口。
+heiher 优化了 stdarch 项目中的 SIMD 函数，将龙架构下的 `vpickve2gr.d` / `vpickve2gr.w` 等 SIMD 指令的底层实现，从原有的手写汇编或内联函数，迁移到使用 `instrinsics::simd` 统一接口。
 
 ## 杂闻播报 {/* #assorted-news */}
 
 ### Box64 {/* #box64 */}
 
-本周 Box64 模拟器在龙架构_DYNAREC 后端迎来大量改进：[ksco](https://github.com/ksco) [优化了](https://github.com/ptitSeb/box64/pull/3839)  MOVNT（Non-Temporal，非临时移动）指令的 modreg 非法操作码处理，[修复了](https://github.com/ptitSeb/box64/pull/3840)龙架构上仅适用 LSX 时路径的逻辑问题，SIMD 指令在无 LASX 扩展时向 LSX 的正确降级路径，并[新增了](https://github.com/ptitSeb/box64/pull/3842)对 `fastround=2` 舍入模式的支持，使浮点运算在需要舍入行为时能够正确翻译和执行，[添加了](https://github.com/ptitSeb/box64/pull/3854) `66 14` (ADC) 和 `66 EB` (CALL) 两个 16 位操作码支持以提升对 16 位 x86 代码的模拟能力。
+[ksco](https://github.com/ksco) 为 Box64 的龙架构 DYNAREC 后端做了大量改进：
+- [优化了](https://github.com/ptitSeb/box64/pull/3839)  `MOVNT`（Non-Temporal，非临时移动）指令的 modreg 非法操作码处理；
+- [修复了](https://github.com/ptitSeb/box64/pull/3840)龙架构上无 LASX 扩展时向 LSX 的正确降级路径；
+- 并[新增了](https://github.com/ptitSeb/box64/pull/3842)对 `fastround=2` 舍入模式的支持，使浮点运算在需要舍入行为时能够正确翻译和执行；
+- [添加了](https://github.com/ptitSeb/box64/pull/3854) `66 14` (ADC) 和 `66 EB` (CALL) 两个 16 位操作码支持，以提升对 16 位 x86 代码的模拟能力。
 
-x87 FPU 指令集模拟得到显著增强，包括 `FBLD/FBSTP` 的 BCD 加载/存储三项[修复](https://github.com/ptitSeb/box64/pull/3850)（加载时忽略符号字节的低半字节、存储时根据 x87 控制字进行舍入、保留负零符号）、[修复了](https://github.com/ptitSeb/box64/pull/3851) `FNSAVE/FRSTOR` 操作码的错误实现，确保 FPU 状态保存或恢复，[修复了](https://github.com/ptitSeb/box64/pull/3853) JIT 中 `XLAT`、[修复了](https://github.com/ptitSeb/box64/pull/3849) `XSAVE`/`XRSTOR` 等指令的错误实现。
+x87 FPU 指令集模拟得到显著增强：
+-  `FBLD/FBSTP` 的 BCD 加载/存储三项[修复](https://github.com/ptitSeb/box64/pull/3850)（加载时忽略符号字节的低半字节、存储时根据 x87 控制字进行舍入、保留负零符号）；
+- [修复了](https://github.com/ptitSeb/box64/pull/3851) `FNSAVE/FRSTOR` 操作码的错误实现，确保 FPU 状态保存或恢复；
+- [修复了](https://github.com/ptitSeb/box64/pull/3853) JIT 中 `XLAT`
+- [修复了](https://github.com/ptitSeb/box64/pull/3849) `XSAVE`/`XRSTOR` 等指令的错误实现。
 
-此外还为龙架构后端。动态缓存方面[优化了](https://github.com/ptitSeb/box64/pull/3858)文本缓存版本生成、[修复了](https://github.com/ptitSeb/box64/pull/3859) CPU 扩展参数检测问题并[添加了](https://github.com/ptitSeb/box64/pull/3860)缓存大小限制选项。其他改进包括[降低了](https://github.com/ptitSeb/box64/pull/3846) `endBox64` 日志冗余、为 libGL（OpenGL 库）的包装层 (wrapper) [添加了](https://github.com/ptitSeb/box64/pull/3847) 1 个图形扩展支持、[支持](https://github.com/ptitSeb/box64/pull/3848) Rust 风格十六进制数字分隔符解析，使其支持 Rust 风格的用下划线分隔数字字面量、[添加了](https://github.com/ptitSeb/box64/pull/3855)简单的运行测试，去除 fork 等调用以方便调试，以及[增加了](https://github.com/ptitSeb/box64/pull/3844)一个假的 Python 解释器来规避平台检测导致的不兼容问题。
+龙架构后端动态缓存方面：
+- [优化了](https://github.com/ptitSeb/box64/pull/3858)文本缓存版本生成；
+- [修复了](https://github.com/ptitSeb/box64/pull/3859) CPU 扩展参数检测问题并[添加了](https://github.com/ptitSeb/box64/pull/3860)缓存大小限制选项。
+
+其他改进包括：
+- [降低了](https://github.com/ptitSeb/box64/pull/3846) `endBox64` 日志冗余；
+- 为 libGL（OpenGL 库）的包装层 (wrapper) [添加了](https://github.com/ptitSeb/box64/pull/3847) 1 个图形扩展支持；
+- [支持](https://github.com/ptitSeb/box64/pull/3848) Rust 风格十六进制数字分隔符解析，使其支持 Rust 风格的用下划线分隔数字字面量；
+- [添加了](https://github.com/ptitSeb/box64/pull/3855)简单的运行测试，去除 fork 等调用以方便调试；
+- [增加了](https://github.com/ptitSeb/box64/pull/3844)一个假的 Python 解释器来规避平台检测导致的不兼容问题。
 
 ### EDK II {/* #edk2 */}
 
@@ -105,8 +121,6 @@ x87 FPU 指令集模拟得到显著增强，包括 `FBLD/FBSTP` 的 BCD 加载/�
 [CSharperMantle](https://github.com/CSharperMantle) [报告了](https://github.com/rui314/mold/issues/1584) mold 链接器在龙架构上执行指令 relaxation 后，未能正确清理或更新重定位表，导致过时的重定位残留并错位到其他指令上。
 
 [miiyakumo](https://github.com/miiyakumo) 计划[重构](https://github.com/comix-kernel/comix/issues/249) Comix 内核的启动流程，将 RISC-V 和龙架构共用的初始化逻辑抽离到通用模块中。
-
----
 
 [zevorn](https://github.com/zevorn) 为 machina 模拟器[添加了](https://github.com/gevico/machina/pull/154)龙架构 LVZ 扩展的关键模拟功能，使其能够启动 Linux guest 并成功通过 KVM 烟雾测试 (`KVM_SMOKE_RESULT=PASS`)，修复了包括存储条件指令语义、FDT 内存映射在内的多个问题。
 
