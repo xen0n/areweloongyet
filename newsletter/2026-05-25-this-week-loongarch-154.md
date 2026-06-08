@@ -2,7 +2,7 @@
 slug: this-week-in-loongarch-154
 title: 每周一龙：第 154 期
 authors: [jokerm13]
-date: 2026-05-29T02:00:00+08:00  # TODO: change to actual time in the finishing commit
+date: 2026-06-08T02:00:00+08:00  # TODO: change to actual time in the finishing commit
 tags: [每周一龙]
 ---
 
@@ -89,7 +89,7 @@ Tiezhu Yang [提交了](https://lore.kernel.org/loongarch/20260526070316.28228-1
 
 ### Box64 {/* #box64 */}
 
-[Yang Liu (ksco)](https://github.com/ksco) 本周向 Box64 提交了多笔针对龙架构的贡献，其中包括启用 AVX 指令集仿真及针对Wine 新版本 (> 11.5) 和一些游戏的兼容性修复：
+[Yang Liu (ksco)](https://github.com/ksco) 本周向 Box64 提交了多笔针对龙架构的贡献，其中包括启用 AVX 指令集仿真及针对Wine 新版本 (&gt; 11.5) 和一些游戏的兼容性修复：
 
 - 为龙架构默认[启用了](https://github.com/ptitSeb/box64/pull/3907) AVX 指令集仿真，提升运行 AVX 密集型 x86 应用的性能。
 - 使用哈希表[优化了](https://github.com/ptitSeb/box64/pull/3890) DynaRec 中构建大代码块时的代码发现性能，大幅缩短新版本 Wine 冷启动用时（从 21 秒缩短到 16 秒）。
@@ -142,7 +142,10 @@ Tiezhu Yang [提交了](https://lore.kernel.org/loongarch/20260526070316.28228-1
 
 [Xiaotian Wu (yetist)](https://github.com/yetist) 为 blink.lib（是 Neovim 流行代码补全插件 blink.cmp 的一个底层共享函数库）[添加了](https://github.com/saghen/blink.lib/pull/22)龙架构支持，并为 blink.cmp [添加了](https://github.com/saghen/blink.cmp/pull/2549)龙架构 CI 构建支持。
 
-[Rui Zhou (ZR233)](https://github.com/ZR233) 为 tgoskits（面向操作系统与虚拟化开发的集成仓库）[修复了](https://github.com/rcore-os/tgoskits/pull/959) Starry LoongArch CI 中 apk-curl 测试偶发卡死的问题，为 apk 操作添加独立超时、增加 CERNET 和 Alpine upstream 镜像 fallback、添加 `APK_CURL_*` 阶段 marker 将总超时从 1200s 降低到 420s，并修复了 `axfs-ng-vfs` 中的若干锁顺序问题，避免 lockdep 误判和死锁风险。[Kelei Cheng (Lfan-ke)](https://github.com/Lfan-ke) 则[修复了](https://github.com/rcore-os/tgoskits/pull/922)龙架构上因页分配器选取空闲区域有问题，导致系统有空闲内存但仍然内存溢出，用户态分配被锁死在 248 MB 空间的问题，通过选择最大空闲区初始化页分配器，解决该问题；[Kelei Cheng (Lfan-ke)](https://github.com/Lfan-ke) 上周还[修复了](https://github.com/rcore-os/tgoskits/pull/917)龙架构上用户态 LSX 可用性的问题，包括龙架构上 FP/向量密集的用户程序，如 gradle/kotlin 在信号/抢占下崩溃或挂起、numpy 拒绝 import。
+本周 tgoskits（面向操作系统与虚拟化开发的集成仓库）上有部分功能修复：
+
+- [Rui Zhou (ZR233)](https://github.com/ZR233) [修复了](https://github.com/rcore-os/tgoskits/pull/959) Starry LoongArch CI 中 apk-curl 测试偶发卡死的问题，为 apk 操作添加独立超时、增加 CERNET 和 Alpine upstream 镜像 fallback、添加 `APK_CURL_*` 阶段 marker 将总超时从 1200s 降低到 420s，并修复了 `axfs-ng-vfs` 中的若干锁顺序问题，避免 lockdep 误判和死锁风险。
+- [Kelei Cheng (Lfan-ke)](https://github.com/Lfan-ke) [修复了](https://github.com/rcore-os/tgoskits/pull/922)龙架构上因页分配器选取空闲区域有问题，导致系统有空闲内存但仍然内存溢出，用户态分配被锁死在 248 MB 空间的问题，通过选择最大空闲区初始化页分配器，解决该问题；还[修复了](https://github.com/rcore-os/tgoskits/pull/917)龙架构上用户态 LSX 可用性的问题，包括龙架构上 FP/向量密集的用户程序，如 gradle/kotlin 在信号/抢占下崩溃或挂起、numpy 拒绝 import。
 
 ## 张贴栏 {/* #bulletin */}
 
