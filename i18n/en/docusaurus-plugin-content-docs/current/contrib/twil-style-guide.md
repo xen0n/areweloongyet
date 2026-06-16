@@ -293,6 +293,18 @@ will, after adaptation, either collapse to **at most one sentence** (if the
 latest revision is significant) or **the entire item will be removed**
 (if it is just the Nth trivial revision).
 
+#### Special handling for backports
+
+Backports are an exception to the rule above. Although they relate to
+previously covered patches, they are **standalone patchsets** in their own
+right and carry practical value for downstream distribution maintainers:
+
+- **First submission of a backport** and the **final merged/shipped
+  notification** count as "news" and should be retained.
+- Routine revisions within a backport patchset (typo fixes, cc stable
+  adjustments, etc.) still follow the regular granularity rule and do not
+  constitute reportable items.
+
 ## Adapting contributions from other newsletters
 
 Contributors (including new editors) may simultaneously write for other
