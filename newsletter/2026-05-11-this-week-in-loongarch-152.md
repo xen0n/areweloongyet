@@ -25,17 +25,15 @@ Bibo Mao [提交了](https://lore.kernel.org/loongarch/20260509040159.338866-1-m
 
 Bibo Mao 提交了优化 KVM 中断注入的 v2 补丁，[新增了](https://lore.kernel.org/loongarch/20260514062824.1378373-1-maobibo@loongson.cn/T/#t)中断号和 CSR 写入的有效性检查，并将中断清除与注入的批量化处理合并为一个补丁。
 
-> 此系列的前情提要：WANG Rui [解决了](https://lore.kernel.org/loongarch/20260426120231.532644-1-r@hev.cc/T/#t)启用 KASLR 时内核映像与 initrd 之间的重叠问题；随后，WANG Rui [提交了](https://lore.kernel.org/loongarch/20260428040159.1065822-1-r@hev.cc/T/#me0cd42adeb0d4830b0d990d07c6b5e63b446b801) v2 版本（基于 RFC v1），删除了 `rdtime_h/1` 补丁，改用 `random_get_entropy()`；增加了对齐、最小偏移等安全性改进。2026 年 4 月 29 日，WANG Rui [提交了](https://lore.kernel.org/loongarch/7efff830-06c6-44d8-a613-f230253c014e@app.fastmail.com/)此系列的 v3 补丁，新增了 initrd 重叠检查，恢复了 Kconfig range 的原有范围，并根据 v2 反馈优化了函数命名和类型；同日，WANG Rui [提交了](https://lore.kernel.org/loongarch/20260429120300.1786210-1-r@hev.cc/T/#t)此系列的 v4 补丁，根据 Huacai Chen 的反馈重命名函数并修正变量类型。
-
 WANG Rui 针对内核启用 KASLR 时与 initrd 内存重叠问题的补丁系列，本周迎来了第五版：[新增了](https://lore.kernel.org/loongarch/20260511104555.196270-1-r@hev.cc/T/#t)休眠场景的处理（检测 `resume=` 参数时禁用 KASLR），并添加了注释说明 KASLR 定义。
 
-Jinjie Ruan 在为 arm64/riscv 架构添加 crashkernel CMA 预留添加支持的补丁中，[添加了](https://lore.kernel.org/loongarch/20260511030454.1730881-1-ruanjinjie@huawei.com/T/#t)龙架构中的 buffer overflow 边界检查防止越界访问，并通过使用公共 helper 简化了代码实现。
+Jinjie Ruan 在为 arm64/riscv 架构添加 crashkernel CMA 预留添加支持的补丁中，[实现了](https://lore.kernel.org/loongarch/20260511030454.1730881-1-ruanjinjie@huawei.com/T/#t)龙架构中的 buffer overflow 边界检查防止越界访问，并通过使用公共 helper 简化了代码实现。
 
 Tianyang Zhang 基于 2026 年 2 月 3 日[提交](https://lore.kernel.org/loongarch/20260203124522.2288900-1-zhangtianyang@loongson.cn/)的此系列 v11 补丁，[提交了](https://lore.kernel.org/loongarch/CAAhV-H6qd-frORWPV=AQ7xWNk7mSrgSaNZdtyFYwaE8bw8gCqg@mail.gmail.com/T/#mbcac1293be7621f17628e77c550dc4f0990f008a)关于中断重定向支持的 v12 补丁，添加了高级扩展 IRQ 模型的描述、通过 REDIRECT 控制器将 MSI 中断动态映射到 CPU/中断向量，已获得 Huacai Chen 的 `Acked-by`。
 
-Tiezhu Yang [修复了](https://lore.kernel.org/loongarch/20260512082029.2131-1-yangtiezhu@loongson.cn/T/#t)龙架构在高负载追踪下 ftrace 和 kprobes 的四个问题：修复任务迁移后过时的 pre-CPU kprobe 状态未被清除，导致 CPU 永久处于忙碌状态，在 `kprobe_ftrace_handler()` 中添加了自我重置机制；在 SMP 系统上，kprobe 处理程序偶尔在某些 CPU 核心上失败，使用 `larch_insn_text_copy()` 替代直接内存写入；原始代码直接使用原始内存存储将指令分配给缓冲区，缺少指令屏障同步，使用 `larch_insn_patch_text()` 替代直接赋值，修复了单步执行槽准备；修复 `KPROBE_HIT_SS` 和 `KPROBE_REENTER` 两种致命不可恢复递归的处理。作者于 2026 年 5 月 15 日[说明](https://lore.kernel.org/loongarch/CAAhV-H7aR3NBpTk8Nbg0bphuXoDXa+xjo=bMLbrApm-SwvJYOw@mail.gmail.com/T/#t)，放弃补丁 #1，保留补丁 ＃2 和 #4，同时将修改补丁 #3，移除关于「原子性」的介绍。
+Tiezhu Yang [修复了](https://lore.kernel.org/loongarch/20260512082029.2131-1-yangtiezhu@loongson.cn/T/#t)龙架构 ftrace/kprobes 在任务迁移后过时的 per-CPU kprobe 状态未被清除的问题，在 `kprobe_ftrace_handler()` 中添加了自我重置机制；同时使用 `larch_insn_patch_text()` 替代直接内存赋值修复了单步执行槽准备问题。
 
-Hongliang Wang 基于其 v2 补丁（为 ls2x I2C 驱动[添加了](https://lore.kernel.org/loongarch/84c37ac1-3a9c-b0d2-f86a-90712b45b806@loongson.cn/T/#t) `clock` 属性），[发送了](https://lore.kernel.org/loongarch/20260509082837.28778-1-wanghongliang@loongson.cn/T/#u) v3 补丁，根据 Huacai Chen 的审阅意见简化了 I2C 驱动中时钟解析的实现，移除了冗余的 `chip_data` 结构体，将 `factor` 改名为 `div`，优化了条件判断逻辑。
+该系列补丁同时[修复了](https://lore.kernel.org/loongarch/CAAhV-H7aR3NBpTk8Nbg0bphuXoDXa+xjo=bMLbrApm-SwvJYOw@mail.gmail.com/T/#t) SMP 系统上 kprobe 处理程序偶发失败的问题，改用 `larch_insn_text_copy()` 替代直接内存写入。作者后续说明将放弃补丁 #1，保留补丁 #2 和 #4 并修改补丁 #3。
 
 Huacai Chen [修复了](https://lore.kernel.org/loongarch/20260517092432.1025008-1-chenhuacai@loongson.cn/T/#u)龙架构内存热移除代码中因上游接口变更（上游内核提交：`feee6b2989165631b` ("mm/memory\_hotplug: shrink zones when offlining memory") 修改了 `__remove_pages()` 函数的接口，移除了 `zone` 参数）产生的未使用变量的编译警告。
 
@@ -79,32 +77,15 @@ heiher 优化了 stdarch 项目中的 SIMD 函数，将龙架构下的 `vpickve2
 
 ### Box64 {/* #box64 */}
 
-[ksco](https://github.com/ksco) 为 Box64 的龙架构 DYNAREC 后端做了大量改进：
-- [优化了](https://github.com/ptitSeb/box64/pull/3839)  `MOVNT`（Non-Temporal，非临时移动）指令的 modreg 非法操作码处理；
-- [修复了](https://github.com/ptitSeb/box64/pull/3840)龙架构上无 LASX 扩展时向 LSX 的正确降级路径；
-- 并[新增了](https://github.com/ptitSeb/box64/pull/3842)对 `fastround=2` 舍入模式的支持，使浮点运算在需要舍入行为时能够正确翻译和执行；
-- [添加了](https://github.com/ptitSeb/box64/pull/3854) `66 14` (ADC) 和 `66 EB` (CALL) 两个 16 位操作码支持，以提升对 16 位 x86 代码的模拟能力。
+[ksco](https://github.com/ksco) 为 Box64 提交了大量改进。DYNAREC 方面：[优化了](https://github.com/ptitSeb/box64/pull/3839) `MOVNT` 指令处理，[修复了](https://github.com/ptitSeb/box64/pull/3840) 无 LASX 时的 LSX 降级路径，并[实现了](https://github.com/ptitSeb/box64/pull/3842) `fastround=2` 舍入模式及多项 16 位操作码支持。
 
-x87 FPU 指令集模拟得到显著增强：
--  `FBLD/FBSTP` 的 BCD 加载/存储三项[修复](https://github.com/ptitSeb/box64/pull/3850)（加载时忽略符号字节的低半字节、存储时根据 x87 控制字进行舍入、保留负零符号）；
-- [修复了](https://github.com/ptitSeb/box64/pull/3851) `FNSAVE/FRSTOR` 操作码的错误实现，确保 FPU 状态保存或恢复；
-- [修复了](https://github.com/ptitSeb/box64/pull/3853) JIT 中 `XLAT`
-- [修复了](https://github.com/ptitSeb/box64/pull/3849) `XSAVE`/`XRSTOR` 等指令的错误实现。
+x87 FPU 指令模拟获得显著增强：修复了 `FBLD`/`FBSTP` BCD 加载/存储、`FNSAVE`/`FRSTOR` 操作码以及 `XSAVE`/`XRSTOR` 指令的多项错误。动态缓存方面：[优化了](https://github.com/ptitSeb/box64/pull/3858)文本缓存版本生成并[实现了](https://github.com/ptitSeb/box64/pull/3860)缓存大小限制。
 
-龙架构后端动态缓存方面：
-- [优化了](https://github.com/ptitSeb/box64/pull/3858)文本缓存版本生成；
-- [修复了](https://github.com/ptitSeb/box64/pull/3859) CPU 扩展参数检测问题并[添加了](https://github.com/ptitSeb/box64/pull/3860)缓存大小限制选项。
-
-其他改进包括：
-- [降低了](https://github.com/ptitSeb/box64/pull/3846) `endBox64` 日志冗余；
-- 为 libGL（OpenGL 库）的包装层 (wrapper) [添加了](https://github.com/ptitSeb/box64/pull/3847) 1 个图形扩展支持；
-- [支持](https://github.com/ptitSeb/box64/pull/3848) Rust 风格十六进制数字分隔符解析，使其支持 Rust 风格的用下划线分隔数字字面量；
-- [添加了](https://github.com/ptitSeb/box64/pull/3855)简单的运行测试，去除 fork 等调用以方便调试；
-- [增加了](https://github.com/ptitSeb/box64/pull/3844)一个假的 Python 解释器来规避平台检测导致的不兼容问题。
+其他改进包括：降低 `endBox64` 日志冗余，为 libGL 包装层[实现了](https://github.com/ptitSeb/box64/pull/3847) 1 个图形扩展支持，[编写了](https://github.com/ptitSeb/box64/pull/3855)简单运行测试，并支持 Rust 风格十六进制数字分隔符解析。
 
 ### EDK II {/* #edk2 */}
 
-[MarsDoge](https://github.com/MarsDoge) 为龙架构虚拟化固件 OvmfPkg [添加了](https://github.com/tianocore/edk2/pull/12586)早期串口基址缓存优化，以显著减少 DEBUG 构建的启动时间。`EarlyFdtSerialPortLib16550` 库在每次调用 `GetSerialRegisterBase()` 时都会从设备树重新解析 UART 基址，在 DEBUG 构建过程中，会因频繁的 FDT 查找而引入明显的启动时间开销，通过复用龙架构 CSR 寄存器 `KS1` 缓存 UART 基址，将 DEBUG 固件中反复解析设备树的耗时优化为单次查找，使 QEMU 启动到 BDS 的时间缩短约 0.85s。
+[MarsDoge](https://github.com/MarsDoge) 为龙架构虚拟化固件 OvmfPkg [实现了](https://github.com/tianocore/edk2/pull/12586)早期串口基址缓存优化，以显著减少 DEBUG 构建的启动时间。`EarlyFdtSerialPortLib16550` 库在每次调用 `GetSerialRegisterBase()` 时都会从设备树重新解析 UART 基址，在 DEBUG 构建过程中，会因频繁的 FDT 查找而引入明显的启动时间开销，通过复用龙架构 CSR 寄存器 `KS1` 缓存 UART 基址，将 DEBUG 固件中反复解析设备树的耗时优化为单次查找，使 QEMU 启动到 BDS 的时间缩短约 0.85s。
 
 ### 其他 {/* #other-assorted-news */}
 
@@ -122,33 +103,29 @@ x87 FPU 指令集模拟得到显著增强：
 
 [miiyakumo](https://github.com/miiyakumo) 计划[重构](https://github.com/comix-kernel/comix/issues/249) Comix 内核的启动流程，将 RISC-V 和龙架构共用的初始化逻辑抽离到通用模块中。
 
-[zevorn](https://github.com/zevorn) 为 machina 模拟器[添加了](https://github.com/gevico/machina/pull/154)龙架构 LVZ 扩展的关键模拟功能，使其能够启动 Linux guest 并成功通过 KVM 烟雾测试 (`KVM_SMOKE_RESULT=PASS`)，修复了包括存储条件指令语义、FDT 内存映射在内的多个问题。
+[zevorn](https://github.com/zevorn) 为 machina 模拟器[实现了](https://github.com/gevico/machina/pull/154)龙架构 LVZ 扩展的关键模拟功能，使其能够启动 Linux guest 并成功通过 KVM 烟雾测试 (`KVM_SMOKE_RESULT=PASS`)，修复了包括存储条件指令语义、FDT 内存映射在内的多个问题。
 
-[wojiushixiaobai](https://github.com/wojiushixiaobai) 为 napi-rs（一个使用 Rust 构建预编译 Node.js 原生扩展框架）[添加了](https://github.com/napi-rs/napi-rs/pull/3287)龙架构（GNU 和 musl）支持，包括目标构建、CI 构建任务和交叉编译 Docker 镜像；审阅指出 Alpine 和 Debain 镜像的构建需要改进。
+[wojiushixiaobai](https://github.com/wojiushixiaobai) 为 napi-rs（一个使用 Rust 构建预编译 Node.js 原生扩展框架）[引入了](https://github.com/napi-rs/napi-rs/pull/3287)龙架构（GNU 和 musl）支持，包括目标构建、CI 构建任务和交叉编译 Docker 镜像；审阅指出 Alpine 和 Debain 镜像的构建需要改进。
 
-[trufae](https://github.com/trufae) 为 r2ghidra（radare2 的 Ghidra 反编译插件）[添加了](https://github.com/radareorg/r2ghidra/pull/238)龙架构的反编译支持，同时增加了 m8c、m16c、68xx、h6309、m680x 等其他架构。
+[trufae](https://github.com/trufae) 为 r2ghidra（radare2 的 Ghidra 反编译插件）[实现了](https://github.com/radareorg/r2ghidra/pull/238)龙架构的反编译支持，同时增加了 m8c、m16c、68xx、h6309、m680x 等其他架构。
 
-[BoneInscri](https://github.com/BoneInscri) 为 hvisor [添加了](https://github.com/syswonder/hvisor/pull/304) 3A6000 平台的 SMP 支持，包括多核启动、IPI 扩展、EIOINTC 中断控制器软件模型、per-CPU 定时器、ACPI/EFI 引导以及调试改进，同时为 hvisor-tool（hvisor 轻量级虚拟机监控器的配置工具集）的[添加了](https://github.com/syswonder/hvisor-tool/pull/90) ACPI 引导下的 virtio IRQ 支持和动态物理内存分配功能；并在 3A6000 平台上提供了多 zone (Linux、seL4、rt-thread、NPU) 的配置示例。
+[BoneInscri](https://github.com/BoneInscri) 为 hvisor [实现了](https://github.com/syswonder/hvisor/pull/304) 3A6000 平台的 SMP 支持，包括多核启动、IPI 扩展、EIOINTC 中断控制器软件模型、per-CPU 定时器、ACPI/EFI 引导以及调试改进，同时为 hvisor-tool（hvisor 轻量级虚拟机监控器的配置工具集）的[实现了](https://github.com/syswonder/hvisor-tool/pull/90) ACPI 引导下的 virtio IRQ 支持和动态物理内存分配功能；并在 3A6000 平台上提供了多 zone (Linux、seL4、rt-thread、NPU) 的配置示例。
 
 [Panxuefeng-loongson](https://github.com/Panxuefeng-loongson) 将 LoongArch64 [移植合并](https://github.com/Tencent/TencentKona-21/pull/20)到腾讯 JDK 发行版 TencentKona-21 中，可能是 TencentKona-21 的 Loongson 分支历史被破坏了，因此重新整合到了一个新分支。
 
 [heiher](https://github.com/heiher) 为 edit 项目[优化了](https://github.com/microsoft/edit/pull/858)龙架构 SIMD 代码，通过使用立即数比较和简化累加器设置，使 `simd/lines_fwd` 在 8 字节和 134 MB 测试场景下吞吐量提升约 25%。
 
-[basilisk-dev](https://github.com/basilisk-dev) 在 Eclipse 社区项目 eUXP 中，为集成库 zlib-ng [添加了](https://github.com/Eclipse-Community/eUXP/pull/2)对龙架构的 SIMD 指令支持。
+[basilisk-dev](https://github.com/basilisk-dev) 在 Eclipse 社区项目 eUXP 中，为集成库 zlib-ng [引入了](https://github.com/Eclipse-Community/eUXP/pull/2)对龙架构的 SIMD 指令支持。
 
-[futzhj](https://github.com/futzhj) 为 ChocoLightEngine [添加了](https://github.com/futzhj/ChocoLightEngine/pull/27)基于 SDL3 的硬件检测模块 `Light.CPUInfo`，提供了 18 个函数 + 1个常量（其中包括龙架构 `HasLSX` 和 `HasLASX` 函数），用于硬件特性检测。
+[futzhj](https://github.com/futzhj) 为 ChocoLightEngine [实现了](https://github.com/futzhj/ChocoLightEngine/pull/27)基于 SDL3 的硬件检测模块 `Light.CPUInfo`，提供了 18 个函数 + 1个常量（其中包括龙架构 `HasLSX` 和 `HasLASX` 函数），用于硬件特性检测。
 
-[doruche](https://github.com/doruche) 为 anemone（一个用 Rust 编写的操作系统内核）内核[添加了](https://github.com/anemone-os/anemone/pull/82) POSIX/Linux 风格信号处理实现，包括龙架构的的信号架构层 (`signal.rs`)、`rt_sigreturn` 蹦床 (trampoline)、用户态 `#[signal_handler]` proc-macro 和信号测试程序，但 `rt_sigreturn` 蹦床汇编可能需要验证。
+[doruche](https://github.com/doruche) 为 anemone（一个用 Rust 编写的操作系统内核）内核[实现了](https://github.com/anemone-os/anemone/pull/82) POSIX/Linux 风格信号处理实现，包括龙架构的的信号架构层 (`signal.rs`)、`rt_sigreturn` 蹦床 (trampoline)、用户态 `#[signal_handler]` proc-macro 和信号测试程序，但 `rt_sigreturn` 蹦床汇编可能需要验证。
 
-[mturac](https://github.com/mturac) 为 Ollama 的 GGML [添加了](https://github.com/ollama/ollama/pull/16172)龙架构量化源文件，从而修复龙架构上的 CMake 构建问题。
+[mturac](https://github.com/mturac) 为 Ollama 的 GGML [提供了](https://github.com/ollama/ollama/pull/16172)龙架构量化源文件，从而修复龙架构上的 CMake 构建问题。
 
-[EDGW](https://github.com/EDGW) 为 Anemone OS（一个用 Rust 编写的操作系统）的 RISC-V64 和 LoongArch64 [添加了](https://github.com/anemone-os/anemone/pull/89)完整的 FPU 支持，包括内核上下文切换、用户态浮点异常处理以及一个浮点功能测试程序。
+[EDGW](https://github.com/EDGW) 为 Anemone OS（一个用 Rust 编写的操作系统）的 RISC-V64 和 LoongArch64 [实现了](https://github.com/anemone-os/anemone/pull/89)完整的 FPU 支持，包括内核上下文切换、用户态浮点异常处理以及一个浮点功能测试程序。
 
-Memtest86plus [发布了](https://github.com/memtest86plus/memtest86plus/pull/589) v8.10，其中有针对龙架构的优化和问题修复：
-
-- [ziyao233](https://github.com/ziyao233) [优化了](https://github.com/memtest86plus/memtest86plus/pull/578)内存速度测试循环，修正了缓存带宽读数。在龙芯3A5000平台上，龙架构上简单逐 8字节复制的循环无法充分利用处理器流水线，而 x86_64 的  rep movsl/movsq 指令则能被优化为高效的微操作。作者将内存复制循环从每次8字节展开 (Unroll) 为每次 64 字节（一个缓存行大小），以填充处理器的加载/存储单元。
-- [MarsDoge](https://github.com/MarsDoge) [修复了](https://github.com/memtest86plus/memtest86plus/pull/589)龙芯 2K3000/3B6000M 平台的显示问题。在龙架构上，位于 4  GiB 以上地址空间的 PCIe MMIO 区域（例如 framebuffer 显存）必须被映射为“非缓存 (Uncached)”属性。作者调整了 PCIe 内存窗口的布局，确保为帧缓冲设备正确设置了内存区域属性。
-- [MarsDoge](https://github.com/MarsDoge) [修改了](https://github.com/memtest86plus/memtest86plus/pull/593)CPU 温度读数溢出与显示格式问题。
+Memtest86plus [发布了](https://github.com/memtest86plus/memtest86plus/pull/589) v8.10，包含多项龙架构优化：[ziyao233](https://github.com/ziyao233) [优化了](https://github.com/memtest86plus/memtest86plus/pull/578)内存速度测试循环以充分利用处理器流水线；[MarsDoge](https://github.com/MarsDoge) [修复了](https://github.com/memtest86plus/memtest86plus/pull/589)龙芯 2K3000/3B6000M 平台的 PCIe MMIO 缓存属性问题及 CPU 温度读数溢出的[显示问题](https://github.com/memtest86plus/memtest86plus/pull/593)。
 
 ### 发行版们 {/* #distros */}
 
@@ -158,11 +135,11 @@ Memtest86plus [发布了](https://github.com/memtest86plus/memtest86plus/pull/58
 
 #### deepin {/* #deepin */}
 
-[Zeno-sole](https://github.com/Zeno-sole) 为 deepin 社区的 libvirt 软件包[添加了](https://github.com/deepin-community/libvirt/pull/23)龙架构支持。
+[Zeno-sole](https://github.com/Zeno-sole) 为 deepin 社区的 libvirt 软件包[启用了](https://github.com/deepin-community/libvirt/pull/23)龙架构支持。
 
 [opsiff](https://github.com/opsiff) 为 deepin 内核的龙架构分支[启用了](https://github.com/deepin-community/kernel/pull/1709) `THP_SWAP` 内核配置选项（已在 x86、ARM64 和 RISCV 上测试可以显著提高交换吞吐量），仅在 `HAVE_ARCH_TRANSPRENT_HUGEPAGE` 被选中时启用，测试显示启用后在 3A5000 上交换带宽提升约 46.75%。
 
-[opsiff](https://github.com/opsiff) 为 deepin 6.12 内核[添加了](https://github.com/deepin-community/kernel/pull/1718)龙架构 PWM 控制器驱动，但目前仍存在需要修复的问题。
+[opsiff](https://github.com/opsiff) 为 deepin 6.12 内核[引入了](https://github.com/deepin-community/kernel/pull/1718)龙架构 PWM 控制器驱动，但目前仍存在需要修复的问题。
 
 [opsiff](https://github.com/opsiff) [临时解决](https://github.com/deepin-community/kernel/pull/1741) CVE-2026-46300（网络分片处理漏洞），在 deepin [6.18.y 内核](https://github.com/deepin-community/kernel/pull/1741)和 [6.12.y 内核](https://github.com/deepin-community/kernel/pull/1740)的龙架构和 ARM64 桌面配置中临时禁用 ESP-in-TCP 相关选项。
 
