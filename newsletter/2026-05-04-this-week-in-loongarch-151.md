@@ -21,17 +21,15 @@ draft: true  # TODO: remove in the finishing commit
 
 ### Linux {/* #linux */}
 
-Rong Bao [修复了](https://lore.kernel.org/loongarch/20260501200000.item004-6.18@kernel.org/T/#m900f2b1988353c3d6551c46d3df197b78cfd563e)龙架构的 `perf annotate` 工具在释放跳转指令内存时，因结构体内存共用导致释放错误的内存区域的问题。`loongarch_jump_ops`（龙架构跳转指令集）在初始化时，缺少了关键清理函数指针 `.free`，导致 `disasm_line__free()` 在处理龙架构跳转指令时会直接使用通用的清理函数 `ins_ops__delete()`，然而这个通用函数假设释放的内存区域与跳转指令使用两个不同的堆缓冲区，但龙架构与其他架构不同，实际使用的是同一堆缓冲区，导致了未定义行为，此修复为 `loongarch_jump_ops` 增加了一个专属的清理函数 `jump_delete`，并分别合入了 v6.18.y、[v6.12.y](https://lore.kernel.org/loongarch/20260501200000.item004-6.12@kernel.org/T/#t)、[v7.0.y](https://lore.kernel.org/loongarch/20260504135146.275021893@linuxfoundation.org/T/#u) 分支。
+Rong Bao [修复了](https://lore.kernel.org/loongarch/20260501200000.item004-6.18@kernel.org/T/#m900f2b1988353c3d6551c46d3df197b78cfd563e)龙架构 `perf annotate` 工具释放跳转指令内存时因结构体内存共用导致的内存错误。`loongarch_jump_ops` 初始化时缺少清理函数指针 `.free`，导致通用清理函数错误释放了与跳转指令共用的堆缓冲区。此修复增加专属清理函数 `jump_delete`，已分别[合入](https://lore.kernel.org/loongarch/20260501200000.item004-6.12@kernel.org/T/#t) v6.12.y、v6.18.y 和 v7.0.y 分支。
 
 Barry Song 和 Oven Liyang [引入了](https://lore.kernel.org/loongarch/CAGsJ_4w4jyQTzvPSzGtv1r5G35kARHrf4WgDvEiOAw8k5AAABg@mail.gmail.com/T/#m46e6b5bd0389d1941a62fb1dde42cbc7d2178b16) `VM_FAULT_RETRY_VMA` 标志并优化 per-VMA 锁的管理策略，使进程在等待 I/O 完成并重试缺页异常时能够继续使用细粒度的 per-VMA 锁，而非退化为全局的 `mmap_lock`。这降低了锁竞争，并解决了因锁持有等待 I/O 而导致的高优先级任务阻塞问题。此补丁为多架构修复补丁，龙架构包含在内。
 
 James Houghton [提交了](https://lore.kernel.org/loongarch/CADrL8HWLMEwwQgD954GOWo4n87Y_G0G700qx8mJisMD0SGr4gQ@mail.gmail.com/T/#mdd66b7ca1f498e4aa373063831d43950e4b13441) KVM 竞态条件修复系列，解决 `kvm_arch_flush_shadow_all()` 可能被并发调用导致的 double-free 问题；其中包含龙架构的修复是在 `kvm_flush_range()` 调用时获取 MMU 锁，但 Bibo Mao 已提出质疑，认为在异常 VM 销毁路径上可能需要更完整的处理。
 
-Hongliang Wang 为 ls2x I2C 驱动[添加了](https://lore.kernel.org/loongarch/84c37ac1-3a9c-b0d2-f86a-90712b45b806@loongson.cn/T/#t) `clocks` 属性解析，使 I2C 总线速度能够根据实际 APB 时钟动态计算；Conor Dooley 回复了 `dt_binding_check` 失败的问题，`clocks` 属性不存在，Hongliang Wang 说明此补丁基于 i2c-host-next 分支，该分支中 `clocks` 已存在。
-
 Bibo Mao [修复了](https://lore.kernel.org/loongarch/20260508013001.4107737-1-maobibo@loongson.cn/T/#u)在 `CONFIG_SMP=n` 配置下编译时因变量未声明而产生的警告。主要原因是三个与 paravirt 特性相关的变量（`virt_preempt`、`virt_spin_lock_key`、`steal_time`）的 `DECLARE` 宏放在 `asm/qspinlock.h` 中，而 `asm/qspinlock.h` 仅在 `CONFIG_SMP=y` 时被包含，所以会出现编译警告。
 
-Hongliang Wang 基于其 v2 补丁（为 ls2x I2C 驱动[添加了](https://lore.kernel.org/loongarch/84c37ac1-3a9c-b0d2-f86a-90712b45b806@loongson.cn/T/#t) `clock` 属性），[发送了](https://lore.kernel.org/loongarch/20260509082837.28778-1-wanghongliang@loongson.cn/T/#u) v3 补丁，根据 Huacai Chen 的审阅意见简化了 I2C 驱动中时钟解析的实现，移除了冗余的 `chip_data` 结构体，将 `factor` 改名为 `div`，优化了条件判断逻辑。
+Hongliang Wang 基于其 v2 补丁（为 ls2x I2C 驱动[实现了](https://lore.kernel.org/loongarch/84c37ac1-3a9c-b0d2-f86a-90712b45b806@loongson.cn/T/#t) `clock` 属性），[发送了](https://lore.kernel.org/loongarch/20260509082837.28778-1-wanghongliang@loongson.cn/T/#u) v3 补丁，根据 Huacai Chen 的审阅意见简化了 I2C 驱动中时钟解析的实现，移除了冗余的 `chip_data` 结构体，将 `factor` 改名为 `div`，优化了条件判断逻辑。
 
 Bibo Mao [移除了](https://lore.kernel.org/loongarch/20260509040159.338866-1-maobibo@loongson.cn/T/#u)龙架构 KVM 软件定时器 (swtimer) 过期时的定时器中断注入。KVM 使用 swtimer 来模拟硬件定时器中断，当 swtimer 到期时会调用 `kvm_swtimer_wakeup()` 函数，该函数同时执行了 `kvm_queue_irq(vcpu, INT_TI)`（注入定时器中断）和 `rcuwait_wake_up(&vcpu->wait)`（唤醒可能处于空闲状态的 vCPU），因为该定时器中断会在 vCPU 唤醒后的 `kvm_restore_timer` 路径中正确注入，此处调用 `kvm_queue_irq` 是冗余的。
 
@@ -41,7 +39,7 @@ Bibo Mao [移除了](https://lore.kernel.org/loongarch/20260509040159.338866-1-m
 
 Lulu Cheng [修复了](https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=1bb9817fa87644db91d713808a78d571086d0d78) GCC Bug #125057，完善 `loongarch_spilt_vector_move` 的拆分条件，以避免差分 GCC 16 开发周期新引入的 `__lasx_cast_128` 操作展开成的从 LSX 寄存器到 LASX 寄存器的移动操作。此种操作不应拆分，但此前被错误地当作从整数寄存器到LASX 寄存器的移动操作拆分，产生不合法的 RTL 代码，导致编译器崩溃。
 
-Lulu Cheng 为龙架构 `ORDERED` [添加了](https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=8332ce8b0b30b03268570e42be65261676836385) `rtx_cost` 支持，将其成本设为与 `UUNORDERED` 相同，修复了 GCC 优化 `VCOND_MASK` 反转导致的 `lasx_vcond-2.c` 和 `lsx-vcond-2.c` 测试失败的问题。
+Lulu Cheng 为龙架构 `ORDERED` [实现了](https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=8332ce8b0b30b03268570e42be65261676836385) `rtx_cost` 支持，将其成本设为与 `UUNORDERED` 相同，修复了 GCC 优化 `VCOND_MASK` 反转导致的 `lasx_vcond-2.c` 和 `lsx-vcond-2.c` 测试失败的问题。
 
 Xi Ruoyao [修复了](https://gcc.gnu.org/r17-404)为 64 位龙架构处理器生成计算 32 位整数末尾零位个数 (count trailing zero) 的代码时，在 `ctz.w` 指令后出现一条多余的符号扩展指令的问题。
 
@@ -57,9 +55,9 @@ Deng Jianbo [报告了](https://sourceware.org/pipermail/libc-alpha/2026-May/177
 
 #### LLVM {/* #llvm */}
 
-[CSharperMantle](https://github.com/CSharperMantle) 为龙架构 LLVM 后端和 Clang 驱动[添加了](https://github.com/llvm/llvm-project/pull/195595) `-fstack-clash-protection` 栈冲突保护 (stack clash protection) 支持，实现方式参考了 RISC-V 后端：对于固定大小栈分配使用循环展开策略进行探测，对于动态栈分配生成探测循环。该功能通过 `clang -fstack-clash-protection` 启用。
+[CSharperMantle](https://github.com/CSharperMantle) 为龙架构 LLVM 后端和 Clang 驱动[实现了](https://github.com/llvm/llvm-project/pull/195595) `-fstack-clash-protection` 栈冲突保护 (stack clash protection) 支持，实现方式参考了 RISC-V 后端：对于固定大小栈分配使用循环展开策略进行探测，对于动态栈分配生成探测循环。该功能通过 `clang -fstack-clash-protection` 启用。
 
-[lrzlin](https://github.com/lrzlin) 为龙架构的 LSX 和 LASX 向量扩展 `sitofp`、`uitofp` [添加了](https://github.com/llvm/llvm-project/pull/196465)测试用例，覆盖了多种位宽和向量长度；CI 自动检查发现测试中使用了已弃用的 `undef`，需要修正。
+[lrzlin](https://github.com/lrzlin) 为龙架构的 LSX 和 LASX 向量扩展 `sitofp`、`uitofp` [编写了](https://github.com/llvm/llvm-project/pull/196465)测试用例，覆盖了多种位宽和向量长度；CI 自动检查发现测试中使用了已弃用的 `undef`，需要修正。
 
 #### Zig {/* #zig */}
 
@@ -75,9 +73,9 @@ Deng Jianbo [报告了](https://sourceware.org/pipermail/libc-alpha/2026-May/177
 
 [ksco](https://github.com/ksco) [修复了](https://github.com/ptitSeb/box64/pull/3826) section 优先级处理逻辑，确保高优先级的配置能够正确地覆盖低优先级的配置。
 
-[ksco](https://github.com/ksco) 为龙架构_DYNAREC [添加了](https://github.com/ptitSeb/box64/pull/3827)对部分 x86_64 F2 和 F3 伪前缀操作码的处理。
+[ksco](https://github.com/ksco) 为龙架构 DYNAREC [实现了](https://github.com/ptitSeb/box64/pull/3827)对部分 x86_64 F2 和 F3 伪前缀操作码的处理。
 
-[ksco](https://github.com/ksco) 为 rcfile 配置文件[添加了](https://github.com/ptitSeb/box64/pull/3828)全局共享 entry 支持，允许配置项跨 section 共享，减少重复定义。
+[ksco](https://github.com/ksco) 为 rcfile 配置文件[实现了](https://github.com/ptitSeb/box64/pull/3828)全局共享 entry 支持，允许配置项跨 section 共享，减少重复定义。
 
 ## 杂闻播报 {/* #assorted-news */}
 
@@ -85,9 +83,9 @@ Deng Jianbo [报告了](https://sourceware.org/pipermail/libc-alpha/2026-May/177
 
 [MarsDoge](https://github.com/MarsDoge) 和 [yetist](https://github.com/ncroxon/gnu-efi/commits?author=yetist) [修复了](https://github.com/ncroxon/gnu-efi/pull/99)龙架构上 `gnu-efi` 库可能被工具链默认向量化优化编入 LSX/LASX 指令的问题，通过在编译显式添加 `-mno-lsx -mno-lasx` 标志，确保 `gnu-efi` 不包含 SIMD 指令，从而避免 UEFI 环境下因使用向量指令导致崩溃。
 
-[phprus](https://github.com/phprus) 为 zlib-ng（zlib 压缩库的下一代分支）的 `/delta` CI 工作流[添加了](https://github.com/zlib-ng/zlib-ng/pull/2278)龙架构支持。目前该提交已被合并。
+[phprus](https://github.com/phprus) 为 zlib-ng 的 `/delta` CI 工作流[启用了](https://github.com/zlib-ng/zlib-ng/pull/2278)龙架构支持。
 
-[zevorn](https://github.com/zevorn) 为 machina（一个用 Rust 编写的虚拟化/模拟器项目）[添加了](https://github.com/gevico/machina/pull/109)龙架构支持，包括指令解码/翻译、MMU/中断、设备模型及 Linux 引导能力，新增 `loongarch64-ref` 参考机器，并通过了测试验证。
+[zevorn](https://github.com/zevorn) 为 machina（一个用 Rust 编写的虚拟化/模拟器项目）[实现了](https://github.com/gevico/machina/pull/109)龙架构支持，包括指令解码/翻译、MMU/中断、设备模型及 Linux 引导能力，新增 `loongarch64-ref` 参考机器，并通过了测试验证。
 
 ## 张贴栏 {/* #bulletin */}
 
