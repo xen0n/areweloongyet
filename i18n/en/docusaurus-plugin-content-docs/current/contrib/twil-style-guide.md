@@ -233,3 +233,51 @@ See the `:::info` blocks throughout the newsletter archives for extended
 discussions of linker relaxation, ABI design decisions, ISA encoding analysis,
 and similar deep topics. These are typically placed in standalone callout
 blocks rather than inline in reporting items.
+
+## Adapting contributions from other newsletters
+
+Contributors (including new editors) may simultaneously write for other
+LoongArch newsletters. These newsletters serve different audiences, so the raw
+copy may systematically diverge from TWiL style:
+
+- **Newsletters targeting non-technical readers** include inline parenthetical
+  term explanations and track review rounds step by step.
+- **TWiL targets a technical audience** that is expected to follow links or
+  look up context independently. Items should be self-contained and scannable.
+
+### Common divergences and how to handle them
+
+| Divergence | Other newsletter style | TWiL treatment |
+|---|---|---|
+| **Review cycles** | Track full v1→review→v2→review→v3 arcs | Report only the final merge or latest version; if a design change is significant, mention the reason in one sentence |
+| **Term explanations** | `PR_SET_SYSCALL_USER_DISPATCH (a Linux prctl operation that…)` | Delete the parenthetical. If a concept genuinely needs explanation for TWiL readers, expand it into a `:::info` block |
+| **Item coverage** | Exhaustive lists (e.g., every single Box64 PR — 11 items) | Curate to 2–3 highlights; summarise or omit the rest |
+| **Verb choice** | `添加了` (added) | Replace with `增加了` (TWiL prefers the more abstract form) |
+| **Editorial voice** | Neutral, cold, no commentary | If something merits commentary, add a `:::info` block or a brief *this means…* sentence; otherwise do not force it |
+
+### Adaptation checklist
+
+When receiving raw copy written for (or influenced by the style of) another
+newsletter, apply the following steps:
+
+1. **Split oversized items**: Break items that cover multiple patch revisions or
+   review rounds into separate items of 1–2 sentences each.
+2. **Remove inline explanations**: Delete parenthetical term explanations
+   (`(a Linux prctl operation that…)`) from reporting sentences. If a concept
+   genuinely needs a science-communication treatment for the TWiL audience,
+   expand it into a standalone `:::info` block instead.
+3. **Trim exhaustive lists**: Reduce long itemised lists (e.g., every commit
+   from a single project) to 2–3 highlights.
+4. **Normalize terminology**: Check and replace wording that deviates from the
+   style guide (e.g., `添加` → `增加`).
+5. **Verify section coverage**: Confirm that all mandatory sections
+   (`先「马」再看`, `杂闻播报`, `张贴栏`) are covered. The
+   `社区整活:儿:` (community fun) section is optional — omit if nothing
+   sufficiently interesting happened this week.
+6. **Supplement editorial commentary** (as needed): If the issue contains
+   topics worth a deeper dive, add 1–2 `:::info` blocks. If there are
+   contributors worth thanking or code-quality observations worth making, use
+   the established editorial markers. Do not force it — a more reportorial
+   issue is preferable to one with contrived personality.
+7. **Fix metadata**: Verify that `slug`, `date`, `draft` status, and other
+   frontmatter fields are correct.
