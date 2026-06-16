@@ -1,6 +1,6 @@
 ---
-slug: this-week-in-loongarch-xx
-title: 每周一龙：第 XX 期
+slug: this-week-in-loongarch-153
+title: 每周一龙：第 153 期
 authors: [xen0n]
 date: 2026-05-25T02:00:00+08:00  # TODO: change to actual time in the finishing commit
 tags: [每周一龙]
@@ -29,9 +29,9 @@ George Guo [修复了](https://lore.kernel.org/loongarch/20260521062631.51517-1-
 
 Tiezhu Yang [修复了](https://lore.kernel.org/loongarch/20260521070128.28086-1-yangtiezhu@loongson.cn/)龙架构 BPF JIT 中尾部调用的序言对齐、偏移量硬编码及计数器 off-by-one 问题。
 
-Tiezhu Yang [添加了](https://lore.kernel.org/loongarch/20260521125636.26744-1-yangtiezhu@loongson.cn/T/#mb0703e01f3510196be50b5350a057f615de14763) BPF 的自测试支持，实现了 `get_preempt_count()` 抢占计数读取，并增加 `__arch_loongarch` 宏以支持按架构过滤测试用例。
+Tiezhu Yang [编写了](https://lore.kernel.org/loongarch/20260521125636.26744-1-yangtiezhu@loongson.cn/T/#mb0703e01f3510196be50b5350a057f615de14763) BPF 的自测试支持，实现了 `get_preempt_count()` 抢占计数读取，并增加 `__arch_loongarch` 宏以支持按架构过滤测试用例。
 
-Eric Biggers 为龙芯 RNG 驱动 (`CRYPPTO_DEV_LOONGSON_RNG`) 的 Kconfig [添加了](https://lore.kernel.org/loongarch/20260522025722.GD5937@quark/T/#m03ed645b948dc7dc1a022348a68e70eff880a56c) `select CRYPTO_RNG` 依赖标记，以解决构建失败的问题。
+Eric Biggers 为龙芯 RNG 驱动的 Kconfig [启用了](https://lore.kernel.org/loongarch/20260522025722.GD5937@quark/T/#m03ed645b948dc7dc1a022348a68e70eff880a56c) `select CRYPTO_RNG` 依赖标记，以解决构建失败的问题。
 
 ### 工具链 {/* #toolchain */}
 
@@ -83,13 +83,13 @@ Qiankang Zhou [修复了](https://gcc.gnu.org/r17-615)因未安装内部头文�
 
 [nihui](https://github.com/nihui) 为 ncnn 框架中的大量算子[增加了](https://github.com/Tencent/ncnn/pull/6737) 4D 张量 (tensor) 支持，龙架构方面利用 LSX/LASX 向量扩展实现算子的 4D 张量处理。
 
-[Gelbpunkt](https://github.com/Gelbpunkt) 为 zlib-rs（一个用 Rust 编写的 zlib 库）[添加了](https://github.com/trifectatechfoundation/zlib-rs/pull/511)龙架构的 CRC32 硬件加速实现，利用架构内置的 CRC 校验指令，因内建函数尚不稳定而暂时使用内联汇编，并计划后续推动 stdarch 改进；[修复了](https://github.com/rust-lang/libz-sys/pull/269) `libz-sys` 构建 zlib-ng 时因缺少龙架构目录而导致的 CMake 编译失败问题。
+[Gelbpunkt](https://github.com/Gelbpunkt) 为 zlib-rs [实现了](https://github.com/trifectatechfoundation/zlib-rs/pull/511)龙架构的 CRC32 硬件加速实现，利用架构内置的 CRC 校验指令，因内建函数尚不稳定而暂时使用内联汇编，并计划后续推动 stdarch 改进；[修复了](https://github.com/rust-lang/libz-sys/pull/269) `libz-sys` 构建 zlib-ng 时因缺少龙架构目录而导致的 CMake 编译失败问题。
 
 [doruche](https://github.com/doruche) 为 Anemone 内核[新增了](https://github.com/anemone-os/anemone/pull/92) futex、interval timer、大量 I/O 和凭证系统调用，并重构了内部锁机制以提高中断上下文安全性，龙架构也同步更新了系统调用表。
 
 [numpy1314](https://github.com/numpy1314) [修复了](https://github.com/Hengyu-Yu/QEMU-LVZ/pull/2) QEMU-LVZ（一个支持龙架构虚拟化的 QEMU 分支）版本中 lddir/ldpte 辅助函数因标志位错误参与物理地址计算而导致的页表遍历错误，并在 rcore-os 中也[提交了](https://github.com/rcore-os/tgoskits/pull/852)这个补丁修复。
 
-[numpy1314](https://github.com/numpy1314) 为 AxVisor (Type-1 虚拟机监控程序) [添加了](https://github.com/rcore-os/tgoskits/pull/768)龙架构下运行 ArceOS 访客机的最小启动支持，修复了页表标志位、MMIO 处理、CI 配置等问题，并最终更新 QEMU-LVZ 依赖以确保正确性。
+[numpy1314](https://github.com/numpy1314) 为 AxVisor [实现了](https://github.com/rcore-os/tgoskits/pull/768)龙架构下运行 ArceOS 访客机的最小启动支持，修复了页表标志位、MMIO 处理、CI 配置等问题，并最终更新 QEMU-LVZ 依赖以确保正确性。
 
 [JounQin](https://github.com/JounQin) 为 unrs-resolver [增加了](https://github.com/unrs/unrs-resolver/pull/209)条件编译逻辑，在 loongarch64-musl 目标平台上自动禁用 `statx` 的 `STATX_DONT_SYNC` 标志，解决了 rustix 在该平台上未导出该标志的编译问题。
 
@@ -97,13 +97,13 @@ Qiankang Zhou [修复了](https://gcc.gnu.org/r17-615)因未安装内部头文�
 
 [anematode](https://github.com/anematode) 为 Stockfish 国际象棋引擎[增加了](https://github.com/official-stockfish/Stockfish/pull/6832)龙架构的性能优化。主要利用内联汇编实现 `hyperbola quintessence` 算法所需的位反转操作，优化了位棋盘 (bitboard) 算法和 NNUE (神经网络评估) 的 SIMD 类型处理。
 
-[arrowd](https://github.com/arrowd) 为 snappy-java（Java 版的 Snappy 压缩库）项目[添加了](https://github.com/xerial/snappy-java/pull/725)龙架构的构建支持，利用 dockcross 工具链进行交叉编译，使项目能够为龙架构生成 native 库，但 AI 审阅发现辅助脚本中存在重复函数定义和过时注释的问题，待修复。
+[arrowd](https://github.com/arrowd) 为 snappy-java 项目[启用了](https://github.com/xerial/snappy-java/pull/725)龙架构的构建支持，利用 dockcross 工具链进行交叉编译，使项目能够为龙架构生成 native 库，但 AI 审阅发现辅助脚本中存在重复函数定义和过时注释的问题，待修复。
 
 [yetist](https://github.com/yetist) 为 iPXE（网络引导固件）的龙架构[禁用了](https://github.com/ipxe/ipxe/pull/1712) LSX/LASX SIMD 指令，并用纯汇编重写了 TCP/IP 校验和函数，性能提升约 39 倍；同时经过维护者审阅，已支持 Secure Boot 构建，但审阅者表示希望龙芯未来能明确 UEFI Secure Boot 的处理方案。
 
-[zhaixiaojuan](https://github.com/zhaixiaojuan) 为 rules_go (Bazel 的 Go 语言规则集) [添加了](https://github.com/bazel-contrib/rules_go/pull/4610)龙架构支持。
+[zhaixiaojuan](https://github.com/zhaixiaojuan) 为 rules_go [启用了](https://github.com/bazel-contrib/rules_go/pull/4610)龙架构支持。
 
-[leno23](https://github.com/leno23) 为 simdjson 的龙架构[添加了](https://github.com/simdjson/simdjson/pull/2727) LSX SIMD 优化的 `fast_needs_escaping` 函数，用于加速 JSON 序列化时的转义字符检测。
+[leno23](https://github.com/leno23) 为 simdjson 的龙架构[实现了](https://github.com/simdjson/simdjson/pull/2727) LSX SIMD 优化的 `fast_needs_escaping` 函数，用于加速 JSON 序列化时的转义字符检测。
 
 [ksco](https://github.com/ksco) 为矢量网络数据包处理库 Vector Packet Processing [增加了](https://github.com/ksco/vpp/commits/loong64/)龙架构支持，目前已完成初稿，准备提交上游。
 
@@ -121,7 +121,7 @@ Qiankang Zhou [修复了](https://gcc.gnu.org/r17-615)因未安装内部头文�
 
 #### deepin {/* #deepin */}
 
-[Avenger-285714](https://github.com/Avenger-285714) 为 deepin 6.18.y 内核的 Rust 支持[添加了](https://github.com/deepin-community/kernel/pull/1754)不受信任数据的安全抽象 API，并更新了包括龙架构在内的多个架构 defconfig 以启用 Rust 构建，增强内核处理用户态数据的安全性。
+[Avenger-285714](https://github.com/Avenger-285714) 为 deepin 6.18.y 内核的 Rust 支持[实现了](https://github.com/deepin-community/kernel/pull/1754)不受信任数据的安全抽象 API，并更新了包括龙架构在内的多个架构 defconfig 以启用 Rust 构建，增强内核处理用户态数据的安全性。
 
 [xionglinlin](https://github.com/xionglinlin) 为 deepin 的 `dde-daemon` [增加了](https://github.com/linuxdeepin/dde-daemon/pull/1111)龙架构的短空闲 (short idle) 状态管理和 TLP 电源管理模式支持，通过内核文件 (`/sys/devices/system/loongarch/relax_state`) 写入状态，实现 CPU 快速空闲/唤醒；第三方应用检测，以防止短空闲误触发；新增 DSG 配置实现智能节能，但代码中存在并发安全、路径安全、性能等多处问题。
 
