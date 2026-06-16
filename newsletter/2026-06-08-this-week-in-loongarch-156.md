@@ -23,13 +23,15 @@ draft: true  # TODO: remove in the finishing commit
 
 Hongliang Wang [提交了](https://lore.kernel.org/loongarch/20260608024533.32419-1-wanghongliang@loongson.cn/)为龙芯 2 号 I<sup>2</sup>C (i2c-ls2x) 驱动添加 clock 属性系列补丁的第 6 版，根据上游审阅者的建议移除了 cc stable。
 
-Hongliang Wang 为龙芯 2K0500、2K1000 和 2K2000 的 I<sup>2</sup>C 控制器节点[添加了](https://lore.kernel.org/loongarch/20260609090543.1462-1-wanghongliang@loongson.cn/) `clocks` 和 `clock-frequency` 属性，其中龙芯 2K0500/2K1000 使用 APB 时钟源（`LOONGSON2_APB_CLK`），2K2000 使用 MISC 时钟源（`LOONGSON2_MISC_CLK`）。该补丁已由审阅者 Huacai Chen [合并](https://lore.kernel.org/loongarch/CAAhV-H5UHa+AZG_NQ_Y6Q69TNRYnM8dYKfnz8m7VPEOB_1mSKw@mail.gmail.com/)。
+Hongliang Wang 为龙芯 2K0500、2K1000 和 2K2000 的 I<sup>2</sup>C 控制器节点[实现了](https://lore.kernel.org/loongarch/20260609090543.1462-1-wanghongliang@loongson.cn/) `clocks` 和 `clock-frequency` 属性，其中龙芯 2K0500/2K1000 使用 APB 时钟源（`LOONGSON2_APB_CLK`），2K2000 使用 MISC 时钟源（`LOONGSON2_MISC_CLK`）。该补丁已由审阅者 Huacai Chen [合并](https://lore.kernel.org/loongarch/CAAhV-H5UHa+AZG_NQ_Y6Q69TNRYnM8dYKfnz8m7VPEOB_1mSKw@mail.gmail.com/)。
 
-George Guo [提交了](https://lore.kernel.org/loongarch/20260608100852.325413-1-dongtai.guo@linux.dev/)为龙架构添加 `klp-build livepatch`（内核热补丁创建工具）工具支持的第 2 版补丁，修正了 Clang 下可写特殊节 (`__bug_table`、`__jump_table`) 的标记问题，同时移除了冗余的 `asm-offsets.h`；阐明了必须使用 `-fPIC` 而非 `-fPIE` 以保留 GOT 间接引用的根本原因；修复了第 1 版补丁在 `CFLAGS` 变量在 `clean_kernel()` 中定义却在 `build_kernel()` 中使用的问题并确定可使用 Clang 编译通过；修改了 `kpl_build` 使用限制，确保其他架构和配置不受到影响；并重新组织了编译标志替换逻辑，确保补丁系列可构建和可二分。
+George Guo [提交了](https://lore.kernel.org/loongarch/20260608100852.325413-1-dongtai.guo@linux.dev/)为龙架构添加 `klp-build livepatch` 工具支持的第 2 版补丁，修正了 Clang 下可写特殊节的标记问题并移除了冗余的 `asm-offsets.h`。
+
+该版补丁阐明了必须使用 `-fPIC` 而非 `-fPIE` 以保留 GOT 间接引用的原因，修复了 `CFLAGS` 变量作用域问题，并重新组织了编译标志替换逻辑。
 
 Binbin Zhou [提交了](https://lore.kernel.org/loongarch/cover.1780908445.git.zhoubinbin@loongson.cn/) CAN-FD (CAN with Flexible Data-Rate) 控制器驱动支持系列的第 2 版补丁：将所有宏定义合并为一个文件；添加了 `COMPILE_TEST Kconfig` 选项并重写了 Kconfig 描述；使用 `regmap_test_bits()` 简化位字段检查并做了代码优化；使用 `guard(spinlock_irqsave)` / `scoped_guard(spinlock_irqsave)`；使用 CAN TDC 框架来获取 SSP 值。审阅者 Vincent Mailhol 就该版补丁[指出](https://lore.kernel.org/loongarch/c9598f85-5b17-4d38-855e-c3840a01452f@kernel.org/)了多个问题。
 
-Tiezhu Yang 为龙架构[实现了](https://lore.kernel.org/loongarch/20260608103516.20643-1-yangtiezhu@loongson.cn/) `THREAD_INFO_IN_TASK` 配置选项：将 `thread_info` 移入 `task_struct`，引入每 CPU 变量 `cpu_tasks` 存储当前任务指针，用于解耦异常入口中 `$tp` 恢复与栈指针的依赖；并内联 BPF helper `bpf_get_current_task()` 和 `bpf_get_smp_processor_id()`，经 3 小时 `stress-ng` 压力测试和 UnixBench 验证通过。但 Bot [反馈](https://lore.kernel.org/loongarch/9f3df2278bfa3db163dc38d388bb060c9459f1c5eab5f42ffd67969d23e5b99f@mail.kernel.org/) 32 位平台 `$tp` 指针存在偏置问题（需在 `__switch_to` 中解偏置）以及 `show_backtrace()` 需添加栈保护。Huacai Chen 针对此系列补丁[指出了](https://lore.kernel.org/loongarch/CAAhV-H5Jub5ddrbLvrve1fU2AFmCokTUCDhkHrDWTupPLb9fkw@mail.gmail.com/)问题并提出了相关修改意见。作者[提交了](https://lore.kernel.org/loongarch/20260611015327.12108-1-yangtiezhu@loongson.cn/) 第 2 版补丁，修复了第 1 版的问题，ashiko-bot [指出](https://lore.kernel.org/loongarch/b88f6055e63f7f4084159c428dc427047d4074517c929f0ce4d6e7bb2b0d57f9@mail.kernel.org/) 32 位 `$tp` 偏置问题未修复；随后作者[提交了](https://lore.kernel.org/loongarch/20260612011616.27771-1-yangtiezhu@loongson.cn/) 第 3 版，修复了该问题。
+Tiezhu Yang [实现了](https://lore.kernel.org/loongarch/20260608103516.20643-1-yangtiezhu@loongson.cn/) `THREAD_INFO_IN_TASK` 配置选项：将 `thread_info` 移入 `task_struct`，解耦异常入口中 `$tp` 恢复与栈指针的依赖，并内联 BPF helper。经 `stress-ng` 压力测试验证通过。经过两轮修订，作者已[提交](https://lore.kernel.org/loongarch/20260612011616.27771-1-yangtiezhu@loongson.cn/)第 3 版修复了 32 位 `$tp` 偏置问题。
 
 Bibo Mao [提交了](https://lore.kernel.org/loongarch/20260526125256.2511876-1-maobibo@loongson.cn/)优化龙架构 KVM 的中断注入机制系列补丁的第 6 版：在 `kvm_vcpu_ioctl_interrupt()` 中移除 `INT_SWI0` 中断注入。在补丁 3 中将重命名宏。审阅者 Huacai Chen 针对补丁 5 [提出了](https://lore.kernel.org/loongarch/CAAhV-H7vMq+-nm8f8aL2CvmNYivaHgWj1cTuyv0BTfPQRKpSJA@mail.gmail.com/)简化建议，作者[说明了](https://lore.kernel.org/loongarch/00f28be5-3805-90d1-d2a5-69734b3d0a03@loongson.cn/)其原写法的必要性，讨论还在继续。
 
@@ -37,7 +39,7 @@ Bibo Mao [提交了](https://lore.kernel.org/loongarch/20260609072715.1005923-1-
 
 Bibo Mao [提交了](https://lore.kernel.org/loongarch/20260608013222.375257-1-maobibo@loongson.cn/)为龙架构 KVM 设置支持的最大 FPU 类型的第 4 版补丁，修复了第 3 版中 `kvm_lose_fpu()` 过早地检查 KVM_LARCH_FPU 标志，导致跳过了 LBT 禁用，因为 API `kvm_lose_fpu()` 隐含了 `kvm_lose_lbt()` 的问题。目前该补丁已被审阅者 Huacai Chen [合并](https://lore.kernel.org/loongarch/CAAhV-H5mZMciE5YY8MA-OW5+CTzjp+qsPDkHHuEdwO+3xFiWJw@mail.gmail.com/)。
 
-George Guo 为龙架构 BPF JIT [添加了](https://lore.kernel.org/loongarch/20260609041407.122384-1-dongtai.guo@linux.dev/)两个功能，每个功能都通过相应的 `bpf_jit_supports_*()` 钩子通知验证器：
+George Guo 为龙架构 BPF JIT [实现了](https://lore.kernel.org/loongarch/20260609041407.122384-1-dongtai.guo@linux.dev/)两个功能，每个功能都通过相应的 `bpf_jit_supports_*()` 钩子通知验证器：
 
 - 实现了仅内部每 CPU (pre-CPU) 使用的地址解析 `BPF_MOV` 指令，通过 `$r21` 寄存器（`__my_cpu_offset`）将每 CPU (pre-CPU) 偏移量转换为绝对地址，用于 `bpf_get_smp_processor_id()` 内联优化和每 CPU 映射 (per-CPU map) 查找;
 - 实现了 `arch_bpf_timed_may_goto()` 方法，因此验证器可以将 `may_goto` 降低为定时、基于 `wall-clock-bounded` 的变体，而不是固定迭代计数器。
@@ -46,7 +48,7 @@ Tiezhu Yang [修复了](https://lore.kernel.org/loongarch/20260611070009.26257-1
 
 Zeng Chi 根据 Binbo Mao [提出](https://lore.kernel.org/loongarch/75a7525a-28d9-fdcb-a696-e56942530e7c@loongson.cn/)的修改意见[提交了](https://lore.kernel.org/loongarch/20260605083108.2534481-1-zeng_chi911@163.com/) 第 3 版补丁，仅做了部分代码调整及主题前缀修改，无代码更改。
 
-haoran.jiang 为龙架构[启用了](https://lore.kernel.org/loongarch/20260606132126.562034-1-haoran.jiang@linux.dev/) `STRICT_MODULE_RWX`（更严格的模块内存权限）安全特性，并将 fixmap（固定映射）的页表移动到 BSS 段，Huacai Chen [指出](https://lore.kernel.org/loongarch/CAAhV-H69RhiGRHO_eBzkU-aWdV92r6LnnbV1pptph85qboArgQ@mail.gmail.com/)不需要更改 fixmap，只需要使用 `set_memory()` API 即可。随后作者[提交了](https://lore.kernel.org/loongarch/20260608063025.281047-1-haoran.jiang@linux.dev/) 第 2 版补丁，将修改页面表权限的方法从 `patch_map` 更改为 `set_memory_xx`。同日[提交了](https://lore.kernel.org/loongarch/20260608063857.291340-1-haoran.jiang@linux.dev/) 第 3 版，修改了提交描述，审阅者 Huacai Chen 希望作者[删除](https://lore.kernel.org/loongarch/CAAhV-H762twrT91Bxq64hLcbG9s78EO+cOdLhWQ3FbW+he36pg@mail.gmail.com/) `patch_lock`，使用 `text_mutex`，将权限修改移出关中断区域。
+haoran.jiang 为龙架构[启用了](https://lore.kernel.org/loongarch/20260606132126.562034-1-haoran.jiang@linux.dev/) `STRICT_MODULE_RWX` 安全特性。根据 Huacai Chen 的审阅意见，作者已提交到第 3 版，将页面权限修改方法改为 `set_memory_xx` 并需进一步将权限修改移出关中断区域。
 
 Xie Zhibang [修正了](https://lore.kernel.org/loongarch/tencent_8BFBEB8F69A01BED468F9275F99FDC335A06@qq.com/)龙架构 kexec 头文件中 `struct kimage` 声明的位置。
 
@@ -62,13 +64,13 @@ Xi Ruoyao 将对于 stack canary 生存期过长问题导致容易绕过 stack p
 
 #### LLVM {/* #llvm */}
 
-[heiher](https://github.com/heiher) 为龙架构[添加了](https://github.com/llvm/llvm-project/pull/202602) DAG combine 以识别向量扩展左移操作，使其降级为 LSX/LASX 原生 `VSLLWIL` 指令，同时[添加了](https://github.com/llvm/llvm-project/pull/202601)向量左移操作的测试用例。
+[heiher](https://github.com/heiher) 为龙架构[实现了](https://github.com/llvm/llvm-project/pull/202602) DAG combine 以识别向量扩展左移操作，使其降级为 LSX/LASX 原生 `VSLLWIL` 指令，同时[编写了](https://github.com/llvm/llvm-project/pull/202601)向量左移操作的测试用例。
 
-[heiher](https://github.com/heiher) 为龙架构 CRC 字节和半字节指令[实现了](https://github.com/llvm/llvm-project/pull/203201) `SimplifyDemandedBitsForTargetNode()` 传播，使 DAG 组合器能移除冗余掩码操作，同时[添加了](https://github.com/llvm/llvm-project/pull/203200)相关的测试用例。
+[heiher](https://github.com/heiher) 为龙架构 CRC 字节和半字节指令[实现了](https://github.com/llvm/llvm-project/pull/203201) `SimplifyDemandedBitsForTargetNode()` 传播，使 DAG 组合器能移除冗余掩码操作，同时[编写了](https://github.com/llvm/llvm-project/pull/203200)相关的测试用例。
 
 [Runze Lin (lrzlin)](https://github.com/lrzlin) 使用 DAG Combine 为龙架构 LSX/LASX 向量扩展[优化了](https://github.com/llvm/llvm-project/pull/202496) `sitofp`/`uitofp` 转换。
 
-[Runze Lin (lrzlin)](https://github.com/lrzlin) 在 TableGen 中使用 `XVPICKEV` 指令组合[添加了](https://github.com/llvm/llvm-project/pull/202485) 256 位 truncate（截断）操作支持，取代了之前使用 DAGCombiner 的方案，作者解释方案的更改旨在降低复杂度和提高可维护性。
+[Runze Lin (lrzlin)](https://github.com/lrzlin) 在 TableGen 中使用 `XVPICKEV` 指令组合[实现了](https://github.com/llvm/llvm-project/pull/202485) 256 位 truncate 操作支持，取代了之前使用 DAGCombiner 的方案，作者解释方案的更改旨在降低复杂度和提高可维护性。
 
 #### Rust {/* #rust */}
 
@@ -118,13 +120,13 @@ Xi Ruoyao 将对于 stack canary 生存期过长问题导致容易绕过 stack p
 本周 rCoreOS（唐图）的 [tgoskits](https://github.com/rcore-os/tgoskits)（面向操作系统与虚拟化开发的集成仓库）项目中收到了多笔龙架构相关的提交：
 
 - [bullhh](https://github.com/bullhh) [报告并总结了](https://github.com/rcore-os/tgoskits/issues/1145)龙架构 QEMU 环境下使用 AxVisor 启动 Linux guest 的实现结果。
-- [bullhh](https://github.com/bullhh) 为 AxVisor 在龙架构 QEMU+LVZ 环境下[添加了](https://github.com/rcore-os/tgoskits/pull/1207) Linux guest 启动支持。
-- [Feng Lin (Godones)](https://github.com/Godones) 为 eBPF ringbuf [添加了](https://github.com/rcore-os/tgoskits/pull/1208) mmap 支持并修复了龙架构 DMW（直接映射窗口）的问题。
-- [Feng Lin (Godones)](https://github.com/Godones) 为 StarryOS [添加了](https://github.com/rcore-os/tgoskits/pull/1232) axbuild 内核支持，同时将龙架构 std 目标代码模型设置为 small，并将 rootfs 缓存移至 `tmp/axbuild/rootfs`。
-- [Ke He (Lfan-ke)](https://github.com/Lfan-ke) 为龙架构静态 QEMU 平台[添加了](https://github.com/rcore-os/tgoskits/pull/1214)从设备树动态探测物理内存大小的功能；同时新增了回归测试验证。
+- [bullhh](https://github.com/bullhh) 为 AxVisor 在龙架构 QEMU+LVZ 环境下[实现了](https://github.com/rcore-os/tgoskits/pull/1207) Linux guest 启动支持。
+- [Feng Lin (Godones)](https://github.com/Godones) 为 eBPF ringbuf [实现了](https://github.com/rcore-os/tgoskits/pull/1208) mmap 支持并修复了龙架构 DMW（直接映射窗口）的问题。
+- [Feng Lin (Godones)](https://github.com/Godones) 为 StarryOS [实现了](https://github.com/rcore-os/tgoskits/pull/1232) axbuild 内核支持，同时将龙架构 std 目标代码模型设置为 small，并将 rootfs 缓存移至 `tmp/axbuild/rootfs`。
+- [Ke He (Lfan-ke)](https://github.com/Lfan-ke) 为龙架构静态 QEMU 平台[实现了](https://github.com/rcore-os/tgoskits/pull/1214)从设备树动态探测物理内存大小的功能；同时新增了回归测试验证。
 - [MF-B](https://github.com/MF-B) [报告了](https://github.com/rcore-os/tgoskits/issues/1104)将 StarryOS 在 LS2K1000 开发板上的适配计划。
-- [Rui Zhou (ZR233)](https://github.com/ZR233) 为龙架构的 ArceOS/StarryOS [添加了](https://github.com/rcore-os/tgoskits/pull/1216)动态 UEFI 平台引导支持，同时保留 AxVisor 的静态平台引导路径，使两种路径共存。
-- [Rui Zhou (ZR233)](https://github.com/ZR233) 为龙架构[添加了](https://github.com/rcore-os/tgoskits/pull/1190) UEFI 动态平台支持。
+- [Rui Zhou (ZR233)](https://github.com/ZR233) 为龙架构的 ArceOS/StarryOS [实现了](https://github.com/rcore-os/tgoskits/pull/1216)动态 UEFI 平台引导支持，同时保留 AxVisor 的静态平台引导路径，使两种路径共存。
+- [Rui Zhou (ZR233)](https://github.com/ZR233) 为龙架构[实现了](https://github.com/rcore-os/tgoskits/pull/1190) UEFI 动态平台支持。
 - [Rui Zhou (ZR233)](https://github.com/ZR233) [报告了](https://github.com/rcore-os/tgoskits/issues/1229)龙架构 QEMU SMP1 测试系统中，`test-msgrcv` 子测试会导致 QEMU 运行超时（> 1800 秒）。
 - [Utopia-V](https://github.com/Utopia-V) [新增了](https://github.com/rcore-os/tgoskits/pull/1178) `git-https` 压力测试，`openssl-loongarch` 回归测试。同时修复了龙架构上 LASX 状态未正确保存/恢复的问题，使 OpenSSL 等使用向量指令的用户程序正常运行。龙架构仅启用了 FP/LSX，未启用 LASX，也没有在任务切换和信号保存路径中保留完整的 LASX 状态，导致在 StarryOS 上为龙架构配置 `git-https` 压力测试时，触发了 OpenSSL/Python ssl 路径上的用户态非法指令异常。
 
@@ -134,9 +136,9 @@ Xi Ruoyao 将对于 stack canary 生存期过长问题导致容易绕过 stack p
 
 [xcy963](https://github.com/xcy963) [报告了](https://github.com/HITOSTeam/OS_Workspace/issues/27) [OS_Workspace](https://github.com/HITOSTeam/OS_Workspace) 中龙架构内核上电加载地址配置错误导致崩溃的问题。链接脚本 `OS_Workspace/os/src/linker_loongarch.ld` 中 `BASE_ADDRESS` 被错误设置为 `0x9000_0000`（RISC-V 版本为 `0x8000_0000`），导致内核 BSS 段结束地址超出 1 GB 物理内存上限（`0xb025_d048 > 0xb000_0000`），执行 `clear_bss()` 时 PC 跳转到 0 而崩溃；同时内存管理配置仅覆盖了低 512 MB（`0x8000_0000 ~ 0xA000_0000`），高 512 MB 未被纳入帧分配器管理。
 
-[Yang Liu (ksco)](https://git.eden-emu.dev/ksco) 为 Eden（任天堂 Switch 模拟器）的 DynaRmic（用于模拟 ARM 架构指令集）[添加了](https://git.eden-emu.dev/eden-emu/eden/pulls/4054)最小化的 toy 实现，使龙架构可以正确执行 `LSLS` 指令，同时实现了基础寄存器分配、代码块管理和指令发射框架，并通过了相关的单元测试。
+[Yang Liu (ksco)](https://git.eden-emu.dev/ksco) 为 Eden 的 DynaRmic [实现了](https://git.eden-emu.dev/eden-emu/eden/pulls/4054)最小化的 toy 实现，使龙架构可以正确执行 `LSLS` 指令，同时实现了基础寄存器分配、代码块管理和指令发射框架，并通过了相关的单元测试。
 
-[Xuerui Wang (xen0n)](https://github.com/xen0n) 为 [loongfans](https://github.com/loongson-community/loongfans) 双周会页面[添加了](https://github.com/loongson-community/loongfans/pull/131)国际化（英文和俄文）支持。
+[Xuerui Wang (xen0n)](https://github.com/xen0n) 为 loongfans 双周会页面[启用了](https://github.com/loongson-community/loongfans/pull/131)国际化（英文和俄文）支持。
 
 [XMMOE](https://github.com/XMMOE) [提交了](https://github.com/PaddlePaddle/community/pull/1389)第十届 Hackathon 参赛项目提案 ——为 LoongArch 架构开发基于 OpenClaw 与 AI 算力驱动的软件包自动化移植应用。
 
