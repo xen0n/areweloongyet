@@ -1,16 +1,141 @@
 #!/usr/bin/env python3
 """
 TWiL Newsletter Content Analyzer
+==================================
 
 Parses all issues of 《每周一龙》(This Week in LoongArch) and produces structured
 JSON with per-item metrics: word/sentence counts, link placement on verbs, tense
 patterns, editorial commentary detection, and science communication depth.
 
-Usage:
-  python scripts/analyze-newsletter.py                    # prints JSON to stdout
-  python scripts/analyze-newsletter.py > analysis.json    # save to file
-  python scripts/analyze-newsletter.py --summary          # print summary only
-  python scripts/analyze-newsletter.py --samples EDITORIAL # print sample items
+Quick start
+-----------
+
+.. code:: bash
+
+   python scripts/analyze-newsletter.py --summary          # top-level stats
+   python scripts/analyze-newsletter.py --verb-stats       # link-on-verb patterns
+   python scripts/analyze-newsletter.py --by-year          # year-over-year trends
+   python scripts/analyze-newsletter.py --samples editorial  # editorial items
+   python scripts/analyze-newsletter.py --samples detailed   # items with deep explanation
+   python scripts/analyze-newsletter.py > analysis.json    # full JSON dump
+
+LLM prompt for reproducing the full analysis report
+---------------------------------------------------
+
+The following prompt can be given to an LLM that has access to this script.
+It reproduces the four-part report on brevity, sentence construction, commentary,
+and science communication.
+
+.. code-block:: text
+
+   I want you to analyze the TWiL newsletter content style. Run these
+   commands in order and compile the results into a single report:
+
+   1. Run: python scripts/analyze-newsletter.py --summary
+      Use this for: overall word/sentence averages, items-per-issue
+      distribution, editorial rate, explanation depth distribution.
+
+   2. Run: python scripts/analyze-newsletter.py --verb-stats
+      Use this for: total links, links-on-verb percentage, top-20 link
+      verbs showing the dominant sentence-construction pattern.
+
+   3. Run: python scripts/analyze-newsletter.py --by-year
+      Use this for: trend of word count, sentence count, editorial rate,
+      and explanation rate across 2023, 2024, 2025.
+
+   4. Run: python scripts/analyze-newsletter.py --samples editorial
+      Use this for: qualitative examples of what triggers editorial
+      commentary (thanking, correcting, historical context, speculation,
+      code-quality judgment).
+
+   5. Run: python scripts/analyze-newsletter.py --samples detailed
+      Use this for: examples of items that receive in-depth scientific
+      explanation — what topics are explained and in how much detail.
+
+   6. Run: python scripts/analyze-newsletter.py --samples moderate
+      Use this for: contrast — examples of items that receive only
+      a moderate amount of explanation vs. detailed ones.
+
+   7. Run the full JSON dump once with:
+      python scripts/analyze-newsletter.py > /tmp/analysis.json
+      Then write a small Python snippet to compute:
+      - word-count bucket distribution (1–20, 21–40, 41–60, 61–80, 81–100,
+        101–150, 151–200, 200+)
+      - sentence-count distribution (1, 2, 3, ..., 10+)
+      - items-per-issue min/max/mean/median/stdev
+
+   Then synthesize the findings under these four headings:
+
+   - Brevity: avg words, avg sentences, distribution buckets, trend over time.
+   - Sentence construction: dominant template (Name [verb+了](url) object),
+     link-on-verb percentage, top verbs, tense pattern (past-completed with 了),
+     bullet vs. paragraph style.
+   - Commentary: what percentage of items have editorial voice, what triggers
+     it (gratitude, corrections, historical reflection, speculation, code
+     quality), role of :::info blocks (deep dives, history, corrections,
+     主编点评).
+   - Science communication: explanation depth distribution, topics that
+     receive detailed explanation (kernel internals, ABI design, compiler
+     optimizations, ISA design) vs. topics left un-explained (routine fixes,
+     distro news, most LLVM patches), year-over-year trend, explanation
+     structure (fact → why → impact).
+
+Interpreting the output fields
+------------------------------
+
+Each item in the full JSON has these keys:
+
+=============== =============================================================
+Key             Meaning
+=============== =============================================================
+issue           Issue number extracted from slug or filename
+date            Publication date from frontmatter
+section         Breadcrumb path of heading hierarchy (``>``-separated)
+text            Full text of the news item
+type            ``paragraph``, ``bullet``, or ``commentary``
+word_count      CJK characters + space-delimited non-CJK tokens
+sentence_count  Count of ``。！？`` terminators (minimum 1)
+link_count      Inline ``[text](url)`` links in the item
+links_on_verb   How many links have their display text on a Chinese verb
+links           List of ``{text, url, on_verb}`` dicts
+has_explanation Whether the item explains *why* or *how*
+explanation_depth ``none``, ``slight``, ``moderate``, or ``detailed``
+is_editorial    Whether the item contains editorial-marker keywords
+is_bullet       Whether the item originated from a Markdown list
+=============== =============================================================
+
+Classification methodology
+--------------------------
+
+**Explanation depth** is scored by counting regex matches against seven
+categories of "why/how" discourse markers (cause, consequence, purpose,
+contrast, temporal, definition, modality). Thresholds: 0 → none, 1 →
+slight, 2–3 → moderate, 4+ → detailed.
+
+**Editorial detection** uses a keyword list: 笔者认为, 道歉, 吐槽,
+无可厚非, 感谢, 辛苦了, 期待, etc.
+
+**Verb-on-link detection** checks whether a link's display text matches a
+regex of common Chinese action verbs with the ``了`` completive suffix.
+
+**Boilerplate filtering** removes recurring structural text (section
+introductions, submission instructions, greeting lines, TODO placeholders)
+so they are not counted as news items.
+
+Caveats
+-------
+
+- Sentence counting treats every ``。！？`` as a sentence boundary; run-on
+  sentences with only commas are counted as 1.
+- Word counting treats each CJK character as 1 word plus each space-delimited
+  non-CJK token as 1 word. This is a rough heuristic; Chinese "words" are
+  often 1–2 characters.
+- Explanation depth is a heuristic; a score of 4+ does not guarantee the
+  explanation is *correct* or *complete*, only that it contains many
+  explanatory discourse markers.
+- The script excludes ``template.md``, the ``announcing-a-lesser-loong``
+  meta-announcement, and ``in-depth-statx`` (a standalone deep dive, not
+  a numbered issue).
 """
 
 import argparse
