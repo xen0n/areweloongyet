@@ -22,17 +22,17 @@ tags: [每周一龙]
 
 上周 Eric Biggers 为龙芯 RNG 驱动 (`CRYPPTO_DEV_LOONGSON_RNG`) 的 Kconfig  `select CRYPTO_RNG` 依赖标记，以解决构建失败的问题。本周在对这个驱动的作用和去留问题进行[讨论](https://lore.kernel.org/loongarch/20260525145939.GC2018@quark/T/#mc3c4127d89c3ec9d0d35809a8bbf36c710adf251)之余，Herbert Xu 已将该补丁[合并](https://lore.kernel.org/loongarch/ahktWQCfZYel_0hZ@gondor.apana.org.au/T/#m284e91b26b5f1b55e398cd327216b0101e1fcd25)。
 
-George Guo 为龙架构[添加了](https://lore.kernel.org/loongarch/177970825876.4071219.16831083000796070841.b4-reply@b4/T/#m21913dbd9fc4696bda393297ffada4a7bd41bf8a) KHO (Kexec HandOver) 支持及自测试框架，同时多位审阅者提出了意见：Pratyush Yadav [反对](https://lore.kernel.org/loongarch/177970825876.4071219.16831083000796070841.b4-reply@b4/T/#m9bcb3ea4abf4488cfc5c0e15619c826e383238f1)通过命令行传递敏感地址并建议使用设备树 (FDT) 传递数据；Mike Rapoport [建议](https://lore.kernel.org/loongarch/177970825876.4071219.16831083000796070841.b4-reply@b4/T/#m5c999cf98f90c4377e304f6ecaa461eac0e85efa)重组补丁并单独发送 KFENCE 修复；Huacai Chen [质疑](https://lore.kernel.org/loongarch/177970825876.4071219.16831083000796070841.b4-reply@b4/T/#m387790aee65edaed6f0afa162b01d8bc508fa875) i8042 禁用补丁的必要性。
+George Guo 为龙架构[实现了](https://lore.kernel.org/loongarch/177970825876.4071219.16831083000796070841.b4-reply@b4/T/#m21913dbd9fc4696bda393297ffada4a7bd41bf8a) KHO (Kexec HandOver) 支持及自测试框架，同时多位审阅者提出了意见：Pratyush Yadav [反对](https://lore.kernel.org/loongarch/177970825876.4071219.16831083000796070841.b4-reply@b4/T/#m9bcb3ea4abf4488cfc5c0e15619c826e383238f1)通过命令行传递敏感地址并建议使用设备树 (FDT) 传递数据；Mike Rapoport [建议](https://lore.kernel.org/loongarch/177970825876.4071219.16831083000796070841.b4-reply@b4/T/#m5c999cf98f90c4377e304f6ecaa461eac0e85efa)重组补丁并单独发送 KFENCE 修复；Huacai Chen [质疑](https://lore.kernel.org/loongarch/177970825876.4071219.16831083000796070841.b4-reply@b4/T/#m387790aee65edaed6f0afa162b01d8bc508fa875) i8042 禁用补丁的必要性。
 
 Hongliang Wang [提交了](https://lore.kernel.org/loongarch/20260526031021.32662-1-wanghongliang@loongson.cn/T/#m6dd131bcfcd829badecdcdfe8e770a7233dfd619)为龙芯 2 号 I<sup>2</sup>C (i2c-ls2x) 驱动添加 `clock` 属性系列补丁的第 4 版，驱动实现了从设备树或 ACPI 获取参考时钟并根据硬件分频系数计算 I<sup>2</sup>C 总线速度，Huacai Chen 和 Krzysztof Kozlowski 提出了部分修改意见，作者确定将会提交 v5 补丁。
 
 Binbin Zhou [重构了](https://lore.kernel.org/loongarch/cover.1779796354.git.zhoubinbin@loongson.cn/T/#m05ebe0d23dc9b9c665a264c015e142b92961246c)龙架构 I<sup>2</sup>S ASoC 驱动，在 MAINTAINERS 中添加了条目以跟踪龙芯音频驱动；区分内部 DMA (iDMA) 和外部 DMA (eDMA) 实现；并修复了 ES8323 编解码器驱动中的数个问题，审阅者 Mark Brown [指出](https://lore.kernel.org/loongarch/cover.1779796354.git.zhoubinbin@loongson.cn/T/#mc9b2ce52edb6cd2b54e538075e4b2448d726a184) `LS_I2S_CTRL` 需标记为 volatile 且 ES8323 补丁不应预设音量寄存器的问题。
 
-Tao Cui 为龙架构[添加了](https://lore.kernel.org/loongarch/20260526111837.2090768-1-cuitao@kylinos.cn/T/#m94884cdbd359daf6b0478150cc2bb5be81ed385b) KVM  PV TLB (Translation Lookaside Buffer) flush（半虚拟化 TLB 刷新）支持，通过复用 `steal-time` 共享内存页的标志位优化多 vCPU 场景下的 TLB 刷新性能，实测延迟降低 68.6%；但 Bibo Mao [指出](https://lore.kernel.org/loongarch/20260526111837.2090768-1-cuitao@kylinos.cn/T/#m912d54bd6010fec7e1f669086abc5b6bd2fc4ffd) Host/Guest 侧存在内存竞争和字节级 cmpxchg 性能问题；作者发布了 v2 补丁[修复了](https://lore.kernel.org/loongarch/20260528133558.2196416-1-cuitao@kylinos.cn/T/#m6ad9ce0b7638c8c9a8bed462160675c1c195921a)内存竞争问题，Host 侧改用 `amswap_db.w` 原子交换指令，Guest 侧合并为单次 `READ_ONCE` 并使用 32 位 `try_cmpxchg`，延迟降低 68.6%（吞吐量提升约为 3.2 倍）。
+Tao Cui 为龙架构[实现了](https://lore.kernel.org/loongarch/20260526111837.2090768-1-cuitao@kylinos.cn/T/#m94884cdbd359daf6b0478150cc2bb5be81ed385b) KVM PV TLB (Translation Lookaside Buffer) flush（半虚拟化 TLB 刷新）支持，通过复用 `steal-time` 共享内存页的标志位优化多 vCPU 场景下的 TLB 刷新性能，实测延迟降低 68.6%；但 Bibo Mao [指出](https://lore.kernel.org/loongarch/20260526111837.2090768-1-cuitao@kylinos.cn/T/#m912d54bd6010fec7e1f669086abc5b6bd2fc4ffd) Host/Guest 侧存在内存竞争和字节级 cmpxchg 性能问题；作者发布了 v2 补丁[修复了](https://lore.kernel.org/loongarch/20260528133558.2196416-1-cuitao@kylinos.cn/T/#m6ad9ce0b7638c8c9a8bed462160675c1c195921a)内存竞争问题，Host 侧改用 `amswap_db.w` 原子交换指令，Guest 侧合并为单次 `READ_ONCE` 并使用 32 位 `try_cmpxchg`，延迟降低 68.6%（吞吐量提升约为 3.2 倍）。
 
 George Guo [提交了](https://lore.kernel.org/loongarch/dbcb280c-9929-b084-0f2b-4f712a85d17b@loongson.cn/T/#m6d83ff77a88bc3ac19817bc97a63adfc1f1e4858)补丁，让 kexec 避免将内核代码放置在 QEMU 用于存放虚拟机 FDT 的 0x100000 处；先前该问题导致 kexec 后内核无控制台输出。Huacai Chen [建议](https://lore.kernel.org/loongarch/dbcb280c-9929-b084-0f2b-4f712a85d17b@loongson.cn/T/#mfaa55a9ff7f53f7f090a0753abd7ce943273de4e)移动 QEMU FDT 而非内核地址，但 Bibo Mao [指出](https://lore.kernel.org/loongarch/dbcb280c-9929-b084-0f2b-4f712a85d17b@loongson.cn/T/#ma46f54a98740a17dc8046713702e790eeecc77b2)移动 QEMU FDT 会导致与现有虚拟机 UEFI 固件不兼容，因为现行固件从这一固定地址载入和解析 FDT。
 
-Qiang Ma 为龙架构 KVM 的 `kvm_loongarch_cpucfg_get_attr()` 函数[添加了](https://lore.kernel.org/loongarch/20260526074202.789799-1-maqianga@uniontech.com/T/#mdaa2454747f54e1c18687cdd91bd7185822c6b3c) `put_user()` 返回值检查，当用户空间地址无效时返回 `-EFAULT` 而非没有错误提示，`put_user()` 用于将 CPU 配置寄存器值返回到用户空间。
+Qiang Ma 为龙架构 KVM 的 `kvm_loongarch_cpucfg_get_attr()` 函数[实现了](https://lore.kernel.org/loongarch/20260526074202.789799-1-maqianga@uniontech.com/T/#mdaa2454747f54e1c18687cdd91bd7185822c6b3c) `put_user()` 返回值检查，当用户空间地址无效时返回 `-EFAULT` 而非没有错误提示，`put_user()` 用于将 CPU 配置寄存器值返回到用户空间。
 
 Bibo Mao [提交了](https://lore.kernel.org/loongarch/20260522064945.614486-1-maobibo@loongson.cn/T/#ma374704c059e9f497f8d658883e0051560b4e93e)优化龙架构 KVM 的中断注入机制系列补丁的第 4 版：
 
@@ -54,7 +54,7 @@ Yanfei Xu 为龙架构和 PowerPC 架构的 KVM [增加了](https://lore.kernel.
 
 Zeng Chi 根据上周 Bibo Mao 的反馈的锁保护缺失的问题，[提交了](https://lore.kernel.org/loongarch/af3e9ecc-cb30-6d7d-5f2d-19ddf42755a0@loongson.cn/T/#mea2f851a5a68c1d351b537eaec96ba5cb96b3952) v2 补丁，修复了 `ipi.c`、`pch_pic.c` 和 `eiointc.c` 文件中的锁保护缺失的问题，并获得了 Bibo Mao 的 Reviewed-by。
 
-Tiezhu Yang 为 libbpf [添加了](https://lore.kernel.org/loongarch/20260526063936.16769-1-yangtiezhu@loongson.cn/T/)龙架构的 `__NR_bpf` 系统调用号定义（值为 280），避免编译失败的问题，其他开源项目也提到了此补丁修复。
+Tiezhu Yang 为 libbpf [提供了](https://lore.kernel.org/loongarch/20260526063936.16769-1-yangtiezhu@loongson.cn/T/)龙架构的 `__NR_bpf` 系统调用号定义（值为 280），避免编译失败的问题，其他开源项目也提到了此补丁修复。
 
 Tiezhu Yang [提交了](https://lore.kernel.org/loongarch/20260526070316.28228-1-yangtiezhu@loongson.cn/T/#m541c335ae9dfcb7393da253af5a189c2979c6ce7)龙架构 BPF JIT 的尾部调用问题系列补丁的第 2 版，移除了序言对齐的补丁，保留了注释/宏定义重构和 off-by-one 计数器错误修复。
 
@@ -63,7 +63,7 @@ Tiezhu Yang [提交了](https://lore.kernel.org/loongarch/20260526070316.28228-1
 
 #### GCC {/* #gcc */}
 
-[Chen (jiegec)](https://github.com/jiegec) [报告了](https://github.com/loongson-community/discussions/issues/119)在龙架构上使用 LASX 时，Clang 和 GCC 都会为  `706.stockfish_r`  (SPEC CPU 2026 INT Rate) 中的 NNUE 混合符号 int8 点积生成次优代码的问题（Clang 仅用 LSX，GCC 不知道 LASX 有混合符号加宽乘法指令），手写 LASX 汇编相较于 Clang LSX 快约 7.2 倍，比 GCC 16 LASX 快约 39%，[Xi Ruoyao (xry111)](https://github.com/xry111) 已提交 GCC 补丁[添加了](https://gcc.gnu.org/pipermail/gcc-patches/2026-May/718594.html) `usdot_prod` 模式来识别和优化该模式，补丁待审阅。
+[Chen (jiegec)](https://github.com/jiegec) [报告了](https://github.com/loongson-community/discussions/issues/119)在龙架构上使用 LASX 时，Clang 和 GCC 都会为  `706.stockfish_r`  (SPEC CPU 2026 INT Rate) 中的 NNUE 混合符号 int8 点积生成次优代码的问题（Clang 仅用 LSX，GCC 不知道 LASX 有混合符号加宽乘法指令），手写 LASX 汇编相较于 Clang LSX 快约 7.2 倍，比 GCC 16 LASX 快约 39%，[Xi Ruoyao (xry111)](https://github.com/xry111) 已提交 GCC 补丁[实现了](https://gcc.gnu.org/pipermail/gcc-patches/2026-May/718594.html) `usdot_prod` 模式来识别和优化该模式，补丁待审阅。
 
 #### LLVM {/* #llvm */}
 
@@ -89,24 +89,13 @@ Tiezhu Yang [提交了](https://lore.kernel.org/loongarch/20260526070316.28228-1
 
 ### Box64 {/* #box64 */}
 
-[Yang Liu (ksco)](https://github.com/ksco) 本周向 Box64 提交了多笔针对龙架构的贡献，其中包括启用 AVX 指令集仿真及针对Wine 新版本 (&gt; 11.5) 和一些游戏的兼容性修复：
+[Yang Liu (ksco)](https://github.com/ksco) 本周向 Box64 提交了多笔针对龙架构的贡献。DYNAREC 方面：[启用了](https://github.com/ptitSeb/box64/pull/3907) AVX 指令集仿真，使用哈希表[优化了](https://github.com/ptitSeb/box64/pull/3890)大代码块构建时的代码发现性能（Wine 冷启动从 21s 降至 16s），并[实现了](https://github.com/ptitSeb/box64/pull/3897) `PR_SET_SYSCALL_USER_DISPATCH` 模拟修复了 Wine 11.5+ 依赖。此外还[实现了](https://github.com/ptitSeb/box64/pull/3892) deferred signals 机制进一步缩短 Wine 冷启动时间。
 
-- 为龙架构默认[启用了](https://github.com/ptitSeb/box64/pull/3907) AVX 指令集仿真，提升运行 AVX 密集型 x86 应用的性能。
-- 使用哈希表[优化了](https://github.com/ptitSeb/box64/pull/3890) DynaRec 中构建大代码块时的代码发现性能，大幅缩短新版本 Wine 冷启动用时（从 21 秒缩短到 16 秒）。
-- 暂时[忽略了](https://github.com/ptitSeb/box64/pull/3895) Wine 11.5 开始使用的 `PR_SET_SYSCALL_USER_DISPATCH`（是一个 Linux prctl 操作，用于将系统调用的控制权从内核态转移到用户态，允许应用程序选择性拦截和模拟某些系统调用）prctl 操作，该操作在龙架构上不支持，因此忽略了此处调用。随后，作者[实现了](https://github.com/ptitSeb/box64/pull/3897) `PR_SET_SYSCALL_USER_DISPATCH` 模拟，修复了 Wine 11.5+ 对于该 API 的依赖导致的崩溃。
-- [添加了](https://github.com/ptitSeb/box64/pull/3892) deferred signals 机制并应用于代码保护模块，进一步提升新版本 Wine 冷启动用时；[修复了](https://github.com/ptitSeb/box64/pull/3896)添加 deferred signals 机制后出现的问题。
-- [修复了](https://github.com/ptitSeb/box64/pull/3894) brick stubs 可执行权限被意外降级的问题，并修复了新版本 Wine 运行某些程序时的崩溃问题。
-- [增加了](https://github.com/ptitSeb/box64/pull/3891)《使命召唤 4》的单应用配置。
-- [修复了](https://github.com/ptitSeb/box64/pull/3906)龙架构上 `readFreq()` 函数对 CPU 频率的读取问题，使其返回与 `RDTSC` 操作码模拟使用的 `rdtime.d` 计时器相匹配的频率值，而非 `sysinfo` 返回的 CPU 实际频率。
-- [修复了](https://github.com/ptitSeb/box64/pull/3904) Box32 的完整路径解析功能中，运行 Proton 时遇到的空指针解引用问题。
-- [重构了](https://github.com/ptitSeb/box64/pull/3898) DynaRec 上对失效代码块管理，简化逻辑，提升运行时安全。
-- [修复了](https://github.com/ptitSeb/box64/pull/3905)龙架构_DynaRec 中 `RDTSC` 操作码的模拟实现错误。
-- [修复了](https://github.com/ptitSeb/box64/pull/3900)龙架构_DynaRec 中 AVX 的缓存管理问题，并[优化了](https://github.com/ptitSeb/box64/pull/3902) AVX2 配置项的实现方式。
-- [优化了](https://github.com/ptitSeb/box64/pull/3903)龙架构_DynaRec 对 x86 `IRET` 操作码的处理，确保中断返回指令在龙架构上被正确仿真。
+其他改进包括：修复了 brick stubs 可执行权限降级、`RDTSC` 操作码模拟错误及 CPU 频率读取问题；[优化了](https://github.com/ptitSeb/box64/pull/3903) `IRET` 操作码处理和 AVX2 配置项实现方式；[增加了](https://github.com/ptitSeb/box64/pull/3891)《使命召唤 4》单应用配置。
 
 ### EDK II {/* #edk2 */}
 
-[Bo Zhu (90geek)](https://github.com/90geek) 为龙架构[添加了](https://github.com/tianocore/edk2/pull/12623) `__ashlti3`（GCC 及基于 LLVM 的编译器针对体积优化代码时会使用该函数进行 128 位左移操作）函数实现，解决 OpenSSL Curve448 代码因使用 `unsigned __int128` 而产生的 libgcc 的依赖问题，使龙架构固件能正常链接 OpensslLibFull。
+[Bo Zhu (90geek)](https://github.com/90geek) 为龙架构[提供了](https://github.com/tianocore/edk2/pull/12623) `__ashlti3`（GCC 及基于 LLVM 的编译器针对体积优化代码时会使用该函数进行 128 位左移操作）函数实现，解决 OpenSSL Curve448 代码因使用 `unsigned __int128` 而产生的 libgcc 的依赖问题，使龙架构固件能正常链接 OpensslLibFull。
 
 ### 其他 {/* #other-assorted-news */}
 
@@ -120,32 +109,32 @@ Tiezhu Yang [提交了](https://lore.kernel.org/loongarch/20260526070316.28228-1
 
 [Timothy Herchen (anematode)](https://github.com/anematode) 为 Stockfish 国际象棋引擎进一步[提升了](https://github.com/official-stockfish/Stockfish/pull/6862)龙架构上的性能优化，STC 测试显示 Elo 提升约 +2.93。
 
-[darkyzhou](https://github.com/darkyzhou) 为 Redis [添加了](https://github.com/redis/redis/pull/15247)龙架构崩溃回溯支持，因为在 `getAndSetMcontextEip` (`src/debug.c`)中缺少龙架构分支，会进入 `NOT_SUPPORTED`，并返回 NULL 从而跳过寄存器转储。
+[darkyzhou](https://github.com/darkyzhou) 为 Redis [实现了](https://github.com/redis/redis/pull/15247)龙架构崩溃回溯支持，因为在 `getAndSetMcontextEip` (`src/debug.c`)中缺少龙架构分支，会进入 `NOT_SUPPORTED`，并返回 NULL 从而跳过寄存器转储。
 
-[Aelin (Gelbpunkt)](https://github.com/Gelbpunkt) 上周为 zlib-rs（一个用 Rust 编写的 zlib 库）[提交了](https://github.com/trifectatechfoundation/zlib-rs/pull/511)龙架构的 CRC32 硬件加速实现后，[Folkert de Vries (folkertdev)](https://github.com/folkertdev) 建议在 Miri（Rust 的模拟执行器）中也实现这些内嵌函数，因此为龙架构 CRC 内嵌函数[添加了](https://github.com/rust-lang/miri/pull/5062) shim 支持。
+[Aelin (Gelbpunkt)](https://github.com/Gelbpunkt) 上周为 zlib-rs（一个用 Rust 编写的 zlib 库）[提交了](https://github.com/trifectatechfoundation/zlib-rs/pull/511)龙架构的 CRC32 硬件加速实现后，[Folkert de Vries (folkertdev)](https://github.com/folkertdev) 建议在 Miri（Rust 的模拟执行器）中也实现这些内嵌函数，因此为龙架构 CRC 内嵌函数[编写了](https://github.com/rust-lang/miri/pull/5062) shim 支持。
 
-[huhu715-nc](https://github.com/huhu715-nc) 为 agent-browser（AI 智能体驱动的浏览器自动化工具）[添加了](https://github.com/vercel-labs/agent-browser/pull/1390)龙架构支持。
+[huhu715-nc](https://github.com/huhu715-nc) 为 agent-browser [启用了](https://github.com/vercel-labs/agent-browser/pull/1390)龙架构支持。
 
-[Henrik Rydgård (hrydgard)](https://github.com/hrydgard) 为 PPSSPP（跨平台的 PSP 游戏模拟器）[添加了](https://github.com/hrydgard/ppsspp/pull/21733)龙架构的交叉编译设置和 CI 持续构建。
+[Henrik Rydgård (hrydgard)](https://github.com/hrydgard) 为 PPSSPP [启用了](https://github.com/hrydgard/ppsspp/pull/21733)龙架构的交叉编译设置和 CI 持续构建。
 
-[Yang Liu (ksco)](https://git.eden-emu.dev/ksco) 为 Eden（任天堂Switch模拟器）[添加了](https://git.eden-emu.dev/eden-emu/eden/pulls/4015)龙架构支持。
+[Yang Liu (ksco)](https://git.eden-emu.dev/ksco) 为 Eden [实现了](https://git.eden-emu.dev/eden-emu/eden/pulls/4015)龙架构支持。
 
-[Na Zhang (loongson-zn)](https://github.com/loongson-zn) 为 bpfilter [添加了](https://github.com/facebook/bpfilter/pull/549)龙架构支持，编译过程中缺少 `__NR_bpf` 系统调用号的定义导致构建失败；作者完成了 CLA 签署，并通过了 XDP 规则 ACCEPT/DROP 的功能测试。
+[Na Zhang (loongson-zn)](https://github.com/loongson-zn) 为 bpfilter [实现了](https://github.com/facebook/bpfilter/pull/549)龙架构支持，编译过程中缺少 `__NR_bpf` 系统调用号的定义导致构建失败；作者完成了 CLA 签署，并通过了 XDP 规则 ACCEPT/DROP 的功能测试。
 
 [miiyakumo](https://github.com/miiyakumo) [重构了](https://github.com/comix-kernel/comix/pull/257) comix 内核的 CPU 和时钟频率管理，为龙架构陷阱处理添加了 SpinLock 保护；[引入了](https://github.com/comix-kernel/comix/pull/255)硬件陷阱帧抽象 (`HwTrapFrame`) 为龙架构提供实现，更新了控制台输出和中断处理接口。
 
-[Jinyang He (MQ-mengqing)](https://github.com/MQ-mengqing) 为 llama.cpp（LLM 推理框架）为 `q8_0`、`q6_K`、`iq4_xs` 量化类型和 `fp16` 加载和存储[添加了](https://github.com/ggml-org/llama.cpp/pull/23798) LSX 支持。
+[Jinyang He (MQ-mengqing)](https://github.com/MQ-mengqing) 为 llama.cpp（LLM 推理框架）为 `q8_0`、`q6_K`、`iq4_xs` 量化类型和 `fp16` 加载和存储[实现了](https://github.com/ggml-org/llama.cpp/pull/23798) LSX 支持。
 
 [Hui Ni (nihui)](https://github.com/nihui) [优化了](https://github.com/Tencent/ncnn/pull/6749) ncnn 项目中的龙架构的 GEMM 代码和转置打包实现，并新增了 INT8 GEMM NT 测试；[重构了](https://github.com/Tencent/ncnn/pull/6745)龙架构的打包代码风格。
 
-[Trung Lê (runlevel5)](https://github.com/runlevel5) 为 ejson-rs（用 Rust 编写的密钥管理工具）[添加了](https://github.com/runlevel5/ejson-rs/pull/38)龙架构发布构建支持（GNU 和 musl 目标），通过 `cross-rs` 实现交叉编译。
+[Trung Lê (runlevel5)](https://github.com/runlevel5) 为 ejson-rs [启用了](https://github.com/runlevel5/ejson-rs/pull/38)龙架构发布构建支持（GNU 和 musl 目标），通过 `cross-rs` 实现交叉编译。
 
-[Xiaotian Wu (yetist)](https://github.com/yetist) 为 blink.lib（是 Neovim 流行代码补全插件 blink.cmp 的一个底层共享函数库）[添加了](https://github.com/saghen/blink.lib/pull/22)龙架构支持，并为 blink.cmp [添加了](https://github.com/saghen/blink.cmp/pull/2549)龙架构 CI 构建支持。
+[Xiaotian Wu (yetist)](https://github.com/yetist) 为 blink.lib [实现了](https://github.com/saghen/blink.lib/pull/22)龙架构支持，并为 blink.cmp [启用了](https://github.com/saghen/blink.cmp/pull/2549)龙架构 CI 构建支持。
 
-本周 tgoskits（面向操作系统与虚拟化开发的集成仓库）上有部分功能修复：
+本周 tgoskits 上有部分功能修复：
 
-- [Rui Zhou (ZR233)](https://github.com/ZR233) [修复了](https://github.com/rcore-os/tgoskits/pull/959) Starry LoongArch CI 中 apk-curl 测试偶发卡死的问题，为 apk 操作添加独立超时、增加 CERNET 和 Alpine upstream 镜像 fallback、添加 `APK_CURL_*` 阶段 marker 将总超时从 1200s 降低到 420s，并修复了 `axfs-ng-vfs` 中的若干锁顺序问题，避免 lockdep 误判和死锁风险。
-- [Kelei Cheng (Lfan-ke)](https://github.com/Lfan-ke) [修复了](https://github.com/rcore-os/tgoskits/pull/922)龙架构上因页分配器选取空闲区域有问题，导致系统有空闲内存但仍然内存溢出，用户态分配被锁死在 248 MB 空间的问题，通过选择最大空闲区初始化页分配器，解决该问题；还[修复了](https://github.com/rcore-os/tgoskits/pull/917)龙架构上用户态 LSX 可用性的问题，包括龙架构上 FP/向量密集的用户程序，如 gradle/kotlin 在信号/抢占下崩溃或挂起、numpy 拒绝 import。
+- [Rui Zhou (ZR233)](https://github.com/ZR233) [修复了](https://github.com/rcore-os/tgoskits/pull/959) Starry LoongArch CI 中 apk-curl 测试偶发卡死的问题，增加了镜像 fallback 和阶段标记，并修复了 `axfs-ng-vfs` 中的锁顺序问题。
+- [Kelei Cheng (Lfan-ke)](https://github.com/Lfan-ke) [修复了](https://github.com/rcore-os/tgoskits/pull/922)龙架构上页分配器选取空闲区域有误导致 248MB 内存限制的问题，并[修复了](https://github.com/rcore-os/tgoskits/pull/917)用户态 LSX 可用性问题。
 
 ## 张贴栏 {/* #bulletin */}
 
