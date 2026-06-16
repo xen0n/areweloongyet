@@ -23,7 +23,7 @@ draft: true
 
 #### BPF 子系统
 
-Tiezhu Yang 为龙架构 BPF 跳板机制（BPF trampoline，作为内核函数与 BPF 程序及其他 BPF 程序之间的桥梁）[增加了](https://lore.kernel.org/loongarch/CAAhV-H7PXGyTotvTnw6PKYUdVYzeWVHf5CxP_WxvC5cAdtqBFw@mail.gmail.com/T/#t)小结构体参数（≤16 字节）及最多 12 个函数参数的支持，此前龙架构 BPF trampoline 存在两个主要限制：不支持将结构体作为函数参数进行传递；最多只支持 8 个函数参数，而内核中有超过 200 个函数的参数在 9 到 12 个之间，导致这些函数无法被 BPF 程序追踪。
+Tiezhu Yang 为龙架构 BPF 跳板机制（BPF trampoline）[扩展了](https://lore.kernel.org/loongarch/CAAhV-H7PXGyTotvTnw6PKYUdVYzeWVHf5CxP_WxvC5cAdtqBFw@mail.gmail.com/T/#t)参数支持，允许传递小结构体参数（≤16 字节）及最多 12 个函数参数。此前龙架构 BPF trampoline 仅支持 8 个参数且不兼容结构体传参，导致内核中超过 200 个函数无法被 BPF 程序追踪。
 
 Hengqi Chen [提交了](https://lore.kernel.org/loongarch/20260422232407.3862942-1-chenhengqi@outlook.com/T/#t) v2 补丁，为龙架构 BPF trampoline 实现了 `BPF_TRACE_FSESSION` 支持，该功能用于 BPF 程序中追踪函数的进入和退出。新增 `emit_store_stack_imm64()` 辅助函数并在 trampoline 栈中为函数元数据和 cookie 分配空间。
 
@@ -35,9 +35,7 @@ Tiezhu Yang 为龙架构[实现了](https://lore.kernel.org/loongarch/2026042010
 
 Thomas Weißschuh [删除了](https://lore.kernel.org/loongarch/20260422-vdso-loongarch-cleanup-v1-1-1fef08f07614@linutronix.de/T/#u)龙架构 vDSO 中自定义的 `__arch_vdso_hres_capable()` 函数，使用内核的通用函数实现；该函数功能是检查高精度时钟（hres）是否可用。
 
-2025 年 11 月，Huacai Chen、Jiaxun Yang、Yawei Li 为 Linux 内核[添加了](https://lore.kernel.org/loongarch/20251127154832.137925-1-chenhuacai@loongson.cn/T/#t) LoongArch32 支持，对原子操作、内存管理、系统调用及构建系统等模块进行了适配，该系列补丁已合入 `-next` 分支；但  2026 年 4 月 23 日，Nathan Chancellor 指出 Clang 编译 32 位内核时出现编译错误。
-
-> 最新进展（2026 年 4 月 25 日）：`scripts/Makefile.clang` 无条件地将 LoongArch 的目标设置为  `loongarch64-linux-gnusf`（64 位），但 Clang 将 32 位和 64 位 LoongArch 视为两个独立的目标，Nathan Chancellor 建议使用  `-m32`  标志来解决这个问题，目前 Clang 编译问题得到了解决。
+2025 年 11 月，Huacai Chen、Jiaxun Yang、Yawei Li 为 Linux 内核[实现了](https://lore.kernel.org/loongarch/20251127154832.137925-1-chenhuacai@loongson.cn/T/#t) LoongArch32 支持，该系列补丁已合入 `-next` 分支。2026 年 4 月，Nathan Chancellor 指出 Clang 编译 32 位内核时出现 triple 不匹配问题，建议使用 `-m32` 标志解决，目前该问题已修复。
 
 WANG Rui 将龙架构的 KASLR 逻辑从内核移至 EFI stub，[解决了](https://lore.kernel.org/loongarch/20260426120231.532644-1-r@hev.cc/T/#t)内核随机化后可能与 initrd 内存重叠的问题。
 
@@ -63,29 +61,15 @@ WANG Rui 将龙架构的 KASLR 逻辑从内核移至 EFI stub，[解决了](http
 
 ### 动态重编译器 {/* #DYNAREC */}
 
-[ksco](https://github.com/ksco) [修复了](https://github.com/ptitSeb/box64/pull/3786) LoongArch 64 位动态重编译器（LA64_DYNAREC）中 `LOCK XADD` 指令在计算操作结果标志位时使用了错误寄存器的问题，[修正了](https://github.com/ptitSeb/box64/pull/3787) `PCMPESTRI` 这个 SSE4.2 字符串处理指令时存在的错误 ，[修复了](https://github.com/ptitSeb/box64/pull/3788) `BSF` 和 `BSR` 指令在模拟时对奇偶标志位（PF）的计算错误，[修复了](https://github.com/ptitSeb/box64/pull/3793)在模拟 x86 的 `LOCK` 前缀指令时，对龙架构硬件原子指令 `amadd_db.b` 的使用错误。
-
-[ksco](https://github.com/ksco) [修复了](https://github.com/ptitSeb/box64/pull/3790) DYNAREC 在同时启用 `callret=2` 和 `always_test=1` 时发生越界读取 `callret` 数组导致程序崩溃的问题。
-
-[ksco](https://github.com/ksco) [修复了](https://github.com/ptitSeb/box64/pull/3792)在非 LBT （LoongArch Binary Translation，在龙架构中用于加速二进制翻译的硬件特性）路径下，模拟 32 位 `DEC` 指令时对符号标志位（SF）的计算错误。
-
-[ksco](https://github.com/ksco) [修复了](https://github.com/ptitSeb/box64/pull/3795)在模拟 x86 的 `IMUL`（有符号乘法）指令时，对操作码 `0x69` 形式的立即数加载错误。
-
-[ksco](https://github.com/ksco) 通过使用 4 位查找表[改进了](https://github.com/ptitSeb/box64/pull/3797) DYNAREC 中用于模拟 PCLMUL 指令的 `native_pclmul` 系列函数的软件实现速度。
+[ksco](https://github.com/ksco) 为龙架构 DYNAREC [修复了](https://github.com/ptitSeb/box64/pull/3786)多项指令模拟错误，涵盖 `LOCK XADD` 标志位、`PCMPESTRI` 字符串处理、`BSF`/`BSR` 奇偶标志位、`LOCK` 前缀下的 `amadd_db.b` 使用错误以及 32 位 `DEC` 符号标志位等问题；同时[修复了](https://github.com/ptitSeb/box64/pull/3790) `callret=2` 与 `always_test=1` 同时启用时的越界崩溃，并[改进了](https://github.com/ptitSeb/box64/pull/3797) `native_pclmul` 系列函数的软件实现速度。
 
 ### Wrapper 子系统 {/* #wrapper */}
 
-[ksco](https://github.com/ksco) [修复了](https://github.com/ptitSeb/box64/pull/3799) Wrapper 子系统（负责将 x86 库的函数调用转译到原生架构的系统库调用）的多个不同的问题，该补丁提交后作者又针对此修复的[跟进修复](https://github.com/ptitSeb/box64/pull/3802)。为 WRAPPERHELPER 工具[新增了](https://github.com/ptitSeb/box64/pull/3803) `--check-only` 选项，可能用于仅执行检查操作。
-
-[ksco](https://github.com/ksco) 在 libc 中[添加了](https://github.com/ptitSeb/box64/pull/3806) libm（数学库）的包装器，确保无论 x86 程序是在链接 libm 还是 libc，Box64 可以正确将其转移到原生库的对应函数。
-
-[ksco](https://github.com/ksco) [修复了](https://github.com/ptitSeb/box64/pull/3809) Wrapper 子系统在包装 GTK 库的自定义函数时遇到的问题，该补丁提交后作者又针对此修复的[跟进修复](https://github.com/ptitSeb/box64/pull/3810)。
+[ksco](https://github.com/ksco) 为 Box64 Wrapper 子系统[修复了](https://github.com/ptitSeb/box64/pull/3799)多项问题并[增加了](https://github.com/ptitSeb/box64/pull/3806) libm 包装器，确保无论 x86 程序链接 libm 还是 libc 都能正确转接到原生库。
 
 ### 其他 {/* #other-news */}
 
-[ksco](https://github.com/ksco) [改进了](https://github.com/ptitSeb/box64/pull/3789) Box64 测试脚本的参数解析功能，并增加了按编号运行单个测试组合的功能。
-
-[ksco](https://github.com/ksco) [优化了](https://github.com/ptitSeb/box64/pull/3807) ELF 加载器在找不到符号时输出的错误信息，便于问题诊断。
+此外，[ksco](https://github.com/ksco) 还[改进了](https://github.com/ptitSeb/box64/pull/3789) Box64 测试脚本的参数解析与单测试组合运行功能，并[优化了](https://github.com/ptitSeb/box64/pull/3807) ELF 加载器缺失符号时的错误信息输出。
 
 ## 杂闻播报 {/* #assorted-news */}
 
