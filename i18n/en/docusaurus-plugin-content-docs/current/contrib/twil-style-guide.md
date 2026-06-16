@@ -234,6 +234,65 @@ discussions of linker relaxation, ABI design decisions, ISA encoding analysis,
 and similar deep topics. These are typically placed in standalone callout
 blocks rather than inline in reporting items.
 
+## Reporting principles
+
+### Provenance links
+
+**Every TWiL news item must carry at least one source link.** This allows
+readers to verify and explore items independently, and supports future
+traceability. Pure editorial items (transitions, section boilerplate, etc.)
+are exempt.
+
+This rule applies to all sections, including `社区整活:儿:` (community fun).
+If something has no public link to cite, then the editor could not have
+known about it — if content is genuinely worth reporting but exists only in
+non-public channels (e.g., a WeChat group chat; WeChat does not support
+exporting chat history as a public URL):
+
+- The editor **must** first obtain permission from the original author to
+  reproduce the content.
+- After obtaining permission, the editor should move the content to a
+  publicly visible location (screenshots or other suitable forms) and cite
+  that location in the newsletter.
+- The editor **must not** guess or fabricate a URL. If no source link can be
+  provided, the item must be removed.
+
+:::info[Additional requirements for AI agents]
+
+When an AI agent encounters an item with no source link:
+
+- If a public source can be located by the agent (e.g., lore.kernel.org,
+  a GitHub PR), the agent must explicitly inform the user that it found the
+  link and **ask the user for double confirmation**, to guard against
+  hallucination.
+- If no source can be located, the agent must report this to the user and
+  request a link; it must not bypass this step to publish.
+- Record the provenance method in the commit message (agent-located link
+  with confirmation / user-supplied / not found and removed).
+
+:::
+
+### Patchset reporting granularity
+
+Patchsets are the primary source of Linux kernel and toolchain news. To
+maintain scannability:
+
+- **Only report the latest revision if it contains a significant change.**
+  "Significant" means: a design overhaul, a rewrite of the implementation
+  under a similar design, or a takeover of upstream work (author change).
+- Routine review follow-ups and minor fixes (typo fixes, comment additions,
+  cc stable additions/removals, etc.) **do not constitute a news item**.
+- If a patchset was already covered in earlier issues and the new revision
+  has no significant change: **drop the item entirely**.
+- In other words, only **non-trivial work submissions** and **formal releases**
+  (merged to mainline, new version tagged, etc.) count as "news". Regular
+  follow-up work does not.
+
+This means that most "v1→review→v2→review→v3" chains from other newsletters
+will, after adaptation, either collapse to **at most one sentence** (if the
+latest revision is significant) or **the entire item will be removed**
+(if it is just the Nth trivial revision).
+
 ## Adapting contributions from other newsletters
 
 Contributors (including new editors) may simultaneously write for other
@@ -249,7 +308,7 @@ copy may systematically diverge from TWiL style:
 
 | Divergence | Other newsletter style | TWiL treatment |
 |---|---|---|
-| **Review cycles** | Track full v1→review→v2→review→v3 arcs | Report only the final merge or latest version; if a design change is significant, mention the reason in one sentence |
+| **Review cycles** | Track full v1→review→v2→review→v3 arcs | Apply [patchset reporting granularity](#patchset-reporting-granularity): keep only the latest revision with significant changes; drop entirely if no significant change |
 | **Term explanations** | `PR_SET_SYSCALL_USER_DISPATCH (a Linux prctl operation that…)` | Delete the parenthetical. If a concept genuinely needs explanation for TWiL readers, expand it into a `:::info` block |
 | **Item coverage** | Exhaustive lists (e.g., every single Box64 PR — 11 items) | Curate to 2–3 highlights; summarise or omit the rest |
 | **Verb choice** | `添加了` (added) | Replace with `增加了` (TWiL prefers the more abstract form) |
@@ -260,24 +319,33 @@ copy may systematically diverge from TWiL style:
 When receiving raw copy written for (or influenced by the style of) another
 newsletter, apply the following steps:
 
-1. **Split oversized items**: Break items that cover multiple patch revisions or
-   review rounds into separate items of 1–2 sentences each.
-2. **Remove inline explanations**: Delete parenthetical term explanations
+1. **Apply patchset granularity rules**: Split or drop items that cover multiple
+   patch revisions or review rounds. Keep only the latest revision with a
+   [significant change](#patchset-reporting-granularity) (design overhaul,
+   implementation rewrite, author change). Drop routine follow-up work (typo
+   fixes, cc stable changes, review back-and-forth) entirely.
+2. **Check provenance**: Ensure every news item has at least 1 source link.
+   For items without links: locate the link yourself and ask the user for
+   double confirmation, or ask the user to supply one. Drop items that cannot
+   be sourced. Comply with all [provenance link](#provenance-links)
+   constraints (including the public-traceability requirement for
+   `社区整活:儿:` items).
+3. **Remove inline explanations**: Delete parenthetical term explanations
    (`(a Linux prctl operation that…)`) from reporting sentences. If a concept
    genuinely needs a science-communication treatment for the TWiL audience,
    expand it into a standalone `:::info` block instead.
-3. **Trim exhaustive lists**: Reduce long itemised lists (e.g., every commit
+4. **Trim exhaustive lists**: Reduce long itemised lists (e.g., every commit
    from a single project) to 2–3 highlights.
-4. **Normalize terminology**: Check and replace wording that deviates from the
+5. **Normalize terminology**: Check and replace wording that deviates from the
    style guide (e.g., `添加` → `增加`).
-5. **Verify section coverage**: Confirm that all mandatory sections
+6. **Verify section coverage**: Confirm that all mandatory sections
    (`先「马」再看`, `杂闻播报`, `张贴栏`) are covered. The
    `社区整活:儿:` (community fun) section is optional — omit if nothing
    sufficiently interesting happened this week.
-6. **Supplement editorial commentary** (as needed): If the issue contains
+7. **Supplement editorial commentary** (as needed): If the issue contains
    topics worth a deeper dive, add 1–2 `:::info` blocks. If there are
    contributors worth thanking or code-quality observations worth making, use
    the established editorial markers. Do not force it — a more reportorial
    issue is preferable to one with contrived personality.
-7. **Fix metadata**: Verify that `slug`, `date`, `draft` status, and other
+8. **Fix metadata**: Verify that `slug`, `date`, `draft` status, and other
    frontmatter fields are correct.
