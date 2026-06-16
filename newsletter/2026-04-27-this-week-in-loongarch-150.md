@@ -23,7 +23,7 @@ draft: true  # TODO: remove in the finishing commit
 
 #### BPF {/* #bpf */}
 
-Tiezhu Yang 为龙架构[添加了](https://lore.kernel.org/loongarch/20260428080051.20938-1-yangtiezhu@loongson.cn/T/#t) `__arch_loongarch` 架构限定宏，并为 `bpf_get_current_task()` 和 `bpf_get_smp_processor_id()` 添加即时编译器(JIT)内联指令的预期输出测试，用于验证龙架构 BPF JIT 的内联支持。
+Tiezhu Yang 为龙架构[引入了](https://lore.kernel.org/loongarch/20260428080051.20938-1-yangtiezhu@loongson.cn/T/#t) `__arch_loongarch` 架构限定宏，并为 `bpf_get_current_task()` 和 `bpf_get_smp_processor_id()` 添加即时编译器(JIT)内联指令的预期输出测试，用于验证龙架构 BPF JIT 的内联支持。
 
 #### KVM {/* #kvm */}
 
@@ -39,27 +39,25 @@ Huacai Chen [调整了](https://lore.kernel.org/loongarch/CAAhV-H5+mR5gnd6x6yUEF
 
 #### 平台支持 {/* #platform-support-news */}
 
-Binbin Zhou [添加了](https://lore.kernel.org/loongarch/cover.1777273055.git.zhoubinbin@loongson.cn/T/#m853d593e2fbca36822edeaaf3b8c52c808d17067) CAN-FD (CAN with Flexible Data-Rate)控制器驱动支持，实现了 CAN 与 CAN FD 协议，并为 RXDMA 添加了基于龙芯 APB CMC DMA（Advanced Peripheral Bus Configuration and Memory Control Direct Memory Access，是龙芯上专用的数据搬运模块） 引擎的可选 DMA 支持，以优化高负载下的 CPU 使用率。
+Binbin Zhou [实现了](https://lore.kernel.org/loongarch/cover.1777273055.git.zhoubinbin@loongson.cn/T/#m853d593e2fbca36822edeaaf3b8c52c808d17067) CAN-FD (CAN with Flexible Data-Rate)控制器驱动支持，实现了 CAN 与 CAN FD 协议，并为 RXDMA 添加了基于龙芯 APB CMC DMA（Advanced Peripheral Bus Configuration and Memory Control Direct Memory Access，是龙芯上专用的数据搬运模块） 引擎的可选 DMA 支持，以优化高负载下的 CPU 使用率。
 
-Huacai Chen 为龙架构 PCI 根桥[添加了](https://lore.kernel.org/loongarch/20260429080704.2425187-1-chenhuacai@loongson.cn/T/#u) `PCIH` ACPI 标志检测，当固件已通过 ACPI 提供的完整的 64 位内存资源窗口时，跳过内核的无条件 `mem resource fixup`，避免覆盖固件配置；该补丁使行为变为 `per-root-bridge` 可配置，修复了 BAR 分配失败的问题。
+Huacai Chen 为龙架构 PCI 根桥[实现了](https://lore.kernel.org/loongarch/20260429080704.2425187-1-chenhuacai@loongson.cn/T/#u) `PCIH` ACPI 标志检测，当固件已通过 ACPI 提供的完整的 64 位内存资源窗口时，跳过内核的无条件 `mem resource fixup`，避免覆盖固件配置；该补丁使行为变为 `per-root-bridge` 可配置，修复了 BAR 分配失败的问题。
 
 Wentao Guan [修复了](https://lore.kernel.org/loongarch/20260428084204.731000-1-guanwentao@uniontech.com/T/#u) `loongson_gnu_fixup_dma_hang()` 中的潜在地址错误异常（ADE），当插入非 DC2/DC3 GPU（如 LG100）设备时因使用未初始化指针导致的 ADE 地址错误异常及内核崩溃问题，随后[提交了](https://lore.kernel.org/loongarch/20260428110155.754875-1-guanwentao@uniontech.com/T/#u) v4 补丁，说明了版本演变过程，并回退到 v2 版本（重构 commit msg，增加完整 dmesg 链接）。
 
-Qunqin Zhao 为 loongson-se 驱动[添加了](https://lore.kernel.org/loongarch/197d8afc8c6afe165e60c219b0a08ce6b6698ff9.camel@xry111.site/T/#t)多节点中断转发支持，将 node 0 作为中断代理处理其它节点的 SE 中断，但随后 Huacai Chen 说明：“node” 在 NUMA 中与“package”不完全等同，需要考虑 Loongson-3C5000L 的情况，应明确 SE 是 per-node 还是 per-package 设备，Qunqin Zhao 表明，该驱动不兼容 5000 系列；在 3C6000 上 node 与 package 相同，随后 Xi Ruoyao 指出 3C6000/D 中一个 package 有两个节点，说明 node 不等于 package。
+Qunqin Zhao 为 loongson-se 驱动[实现了](https://lore.kernel.org/loongarch/197d8afc8c6afe165e60c219b0a08ce6b6698ff9.camel@xry111.site/T/#t)多节点中断转发支持，将 node 0 作为中断代理处理其它节点的 SE 中断，但随后 Huacai Chen 说明：“node” 在 NUMA 中与“package”不完全等同，需要考虑 Loongson-3C5000L 的情况，应明确 SE 是 per-node 还是 per-package 设备，Qunqin Zhao 表明，该驱动不兼容 5000 系列；在 3C6000 上 node 与 package 相同，随后 Xi Ruoyao 指出 3C6000/D 中一个 package 有两个节点，说明 node 不等于 package。
 
 #### 其他内核功能 {/* #other-news */}
 
-WANG Rui [解决了](https://lore.kernel.org/loongarch/20260426120231.532644-1-r@hev.cc/T/#t)启用 KASLR 时内核映像与 initrd 之间的重叠问题，通过将 KASLR 逻辑从内核移至 EFI 引导存根中，这样内核映像和 initrd 的最终放置位置均由 EFI 内存分配器决定。随后，WANG Rui [提交了](https://lore.kernel.org/loongarch/20260428040159.1065822-1-r@hev.cc/T/#me0cd42adeb0d4830b0d990d07c6b5e63b446b801) v2 版本（基于 RFC v1），删除了 `rdtime_h/1` 补丁，改用 `random_get_entropy()`；增加了对齐、最小偏移等安全性改进。2026 年 4 月 29 日，WANG Rui [提交了](https://lore.kernel.org/loongarch/7efff830-06c6-44d8-a613-f230253c014e@app.fastmail.com/)此系列的 v3 补丁，新增了 initrd 重叠检查，恢复了 Kconfig range 的原有范围，并根据 v2 反馈优化了函数命名和类型；同日，WANG Rui [提交了](https://lore.kernel.org/loongarch/20260429120300.1786210-1-r@hev.cc/T/#t)此系列的 v4 补丁，根据 Huacai Chen 的反馈重命名函数并修正变量类型。
+WANG Rui [重新提交了](https://lore.kernel.org/loongarch/20260429120300.1786210-1-r@hev.cc/T/#t)启用 KASLR 时内核映像与 initrd 重叠问题的 v4 补丁，将 KASLR 逻辑从内核移至 EFI 引导存根中并根据审阅意见进行了多项优化。
 
-WANG Rui 为龙架构[新增了](https://lore.kernel.org/loongarch/20260427034451.717817-1-r@hev.cc/T/#t) `efi_cache_sync_image()` 实现，使用 `ibar` 指令在镜像被 `memcpy` 复制后强制执行指令缓存同步，从而解决了在 EFI stub 引导过程中，内核镜像会通过 `memcpy` 被重定位到一个新的内存地址时只更新了内存中的数据和指令，导致 CPU 的指令缓存（I-Cache）与数据缓存（D-Cache）不一致的错误。随后，WANG Rui [接受了](https://lore.kernel.org/loongarch/20260427083930.36324-1-r@hev.cc/T/#t) Huacai Chen 的审阅意见，将 `efi_cache_sync_image()` 实现移至 `check_platform_features()`，使代码风格与 ARM64 保持一致。2026 年 4 月 27 日，WANG Rui [提交了](https://lore.kernel.org/loongarch/e631d1e5-3f05-42ab-885d-4bd660612d63@app.fastmail.com/T/#m8aaa8d414556a98a6eb8419c839842f8c6230889) v2 补丁，为 EFI stub 内核重定向路径添加指令缓存同步调用，并提供龙架构的 `ibar 0` 实现；该系列已被 Ard Biesheuvel 接受并入 `efi/urgent`，但因破坏 ARM 构建而需先将 `efi_relocate_kernel()` 移入龙架构专用代码。2026 年 4 月 29 日，Huacai Chen 建议[添加](https://lore.kernel.org/loongarch/CAAhV-H5w=UmtZt_JCR=BvZt-+F9usnmjh2dMBLHzeiE-7xBddQ@mail.gmail.com/T/#md7ab49b48e4572101744d4cd8f8cc524d8a18b0f) `cc:stable` 向后移植。
+WANG Rui 为龙架构[新增了](https://lore.kernel.org/loongarch/20260427034451.717817-1-r@hev.cc/T/#t) `efi_cache_sync_image()` 实现并已被 Ard Biesheuvel 接受并入 `efi/urgent`，解决了 EFI stub 引导过程中 `memcpy` 重定位后 I-Cache 与 D-Cache 不一致的问题。
 
 Huacai Chen [修改了](https://lore.kernel.org/loongarch/20260428070627.1740598-1-chenhuacai@loongson.cn/T/#u)龙架构 Kconfig 默认选项为 `CONFIG_64BIT`，因 LoongArch32 的支持，开发人员在 kernel v7.1-rc1 中修改 Kconfig 配置文件，增加了 `CONFIG_32BIT` 支持，因为未指定默认选项，导致此选项成为默认选项。
 
 Tiezhu Yang 基于 Linux Kernel v7.1-rc1 为龙架构[实现了](https://lore.kernel.org/loongarch/20260428072021.7289-1-yangtiezhu@loongson.cn/T/#t) `CONFIG_THREAD_INFO_IN_TASK` ，将 `thread_info` 从栈移入 `task_struct` ，并设置 `$tp`(thread pointer)寄存器指向当前 `task_struct` 的指针。龙架构中将 `thread_info` 放置在内核栈底，这种做法存在安全隐患；同时利用 `$tp` 寄存器始终指向当前 `task_struct`，将 `bpf_get_current_task()` 和 `bpf_get_smp_processor_id()` 等 BPF 辅助函数内联为单条指令。
 
-> 这个补丁基于 2026 年 4 月 20 日 Tiezhu Yang [提交](https://lore.kernel.org/loongarch/20260420102907.4617-1-yangtiezhu@loongson.cn/T/#u)的补丁，增加了 BPF 辅助函数的优化。
-
-Huacai Chen 为龙架构的 32 和 64 位内核分别[添加了](https://lore.kernel.org/loongarch/CAHirt9gdabrd=PY6aWJQmhueeea7NeeZijP_rP_egnQ+-LKnoQ@mail.gmail.com/T/#m6e3908fa3d9beea63dd7813fc7bb68febb3dd7a6) `-m32`和 `-m64` 编译选项（通过 `cc-option` 兼容 GCC），解决了 Clang/LLVM 编译 32 位内核时的 triple 切换问题，WANG Rui 在 Clang 18 和 Clang 22 均编译通过。
+Huacai Chen 为龙架构的 32 和 64 位内核分别[启用了](https://lore.kernel.org/loongarch/CAHirt9gdabrd=PY6aWJQmhueeea7NeeZijP_rP_egnQ+-LKnoQ@mail.gmail.com/T/#m6e3908fa3d9beea63dd7813fc7bb68febb3dd7a6) `-m32`和 `-m64` 编译选项（通过 `cc-option` 兼容 GCC），解决了 Clang/LLVM 编译 32 位内核时的 triple 切换问题，WANG Rui 在 Clang 18 和 Clang 22 均编译通过。
 
 Qiang Ma [移除了](https://lore.kernel.org/loongarch/20260428075050.2280852-1-maqianga@uniontech.com/T/#u)龙架构未使用的 `cpu_has_perf` 宏定义，这个宏被错误的关联到了 `LOONGARCH_CPU_PMP` 特性位。
 
@@ -75,7 +73,7 @@ Huacai Chen [修复了](https://lore.kernel.org/loongarch/20260429080644.2425166
 
 [lrzlin](https://github.com/lrzlin) 为龙架构 LSX 向量符号扩展[实现了](https://github.com/llvm/llvm-project/pull/194325)自定义 Lowering，通过组合 `vslti` 和 `vilvl`/`vilvh` 指令，生成更高效的指令序列。
 
-[heiher](https://github.com/heiher) 为龙架构 vNi128 类型[添加了](https://github.com/llvm/llvm-project/pull/193912)向量加/减支持，LLVM 目前对 `v1i128`（128-bit 向量中包含一个 128-bit 整数）和 `v2i128`（256-bit 向量中包含两个 128-bit 整数）类型的向量 `ADD`/`SUB` 操作，会将其完全展开为标量运算，为了将此行为合法化，扩展了 LSX/LASX 的指令选择模式，使其能够生成龙架构原生的 Q 元素大小的向量 `ADD`/`SUB` 指令：`VADD.Q`、`VSUB.Q`(LSX)和 `XVADD.Q`、`XSUB.Q`(LASX)，并[添加了](https://github.com/llvm/llvm-project/pull/193911)测试文件。
+[heiher](https://github.com/heiher) 为龙架构 vNi128 类型[实现了](https://github.com/llvm/llvm-project/pull/193912)向量加/减支持，LLVM 目前对 `v1i128`（128-bit 向量中包含一个 128-bit 整数）和 `v2i128`（256-bit 向量中包含两个 128-bit 整数）类型的向量 `ADD`/`SUB` 操作，会将其完全展开为标量运算，为了将此行为合法化，扩展了 LSX/LASX 的指令选择模式，使其能够生成龙架构原生的 Q 元素大小的向量 `ADD`/`SUB` 指令：`VADD.Q`、`VSUB.Q`(LSX)和 `XVADD.Q`、`XSUB.Q`(LASX)，并[编写了](https://github.com/llvm/llvm-project/pull/193911)测试文件。
 
 #### Binutils {/* #binutils */}
 
@@ -109,7 +107,7 @@ nihui [报告了](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=125057)龙架构�
 
 [lrzlin](https://github.com/lrzlin) [修复了](https://github.com/hrydgard/ppsspp/pull/21595) PPSSPP 模拟器龙架构版本中 `Jit_WeightsU16Skin` 函数的代码错误，解决了在运行《初音未来 - 歌姬计划 扩展版》等游戏时角色模型被错误拉伸的图形渲染问题。
 
-[Ponsanthini](https://github.com/Ponsanthini) 为 x265 视频编码器[添加了](https://github.com/Multicorewareinc/x265/pull/879) 龙架构 SIMD 优化支持，通过利用 LSX/LASX 向量扩展指令集，对 DCT、量化、帧内预测、运动补偿、环路滤波等核心模块进行了汇编级优化，预计会显著提升龙芯平台上的视频编码性能。。
+[Ponsanthini](https://github.com/Ponsanthini) 为 x265 视频编码器[实现了](https://github.com/Multicorewareinc/x265/pull/879) 龙架构 SIMD 优化支持，通过 LSX/LASX 向量扩展指令集对 DCT、量化、帧内预测、运动补偿、环路滤波等核心模块进行了汇编级优化。
 
 ### 发行版们 {/* #distros */}
 
