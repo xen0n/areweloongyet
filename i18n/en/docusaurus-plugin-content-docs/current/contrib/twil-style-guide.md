@@ -23,9 +23,9 @@ This document is for both **human editors** and **AI agent collaborators**
 
 ## Analysis tooling {/* #analysis-tooling */}
 
-This style guide is derived from metrics produced by
-[`scripts/analyze-newsletter.py`](../../scripts/analyze-newsletter.py). The
-script parses all newsletter issues and outputs per-item word/sentence counts,
+This style guide is derived from metrics produced by `scripts/analyze-newsletter.py`
+in this project's repository.
+The script parses all newsletter issues and outputs per-item word/sentence counts,
 verb-on-link ratios, editorial-tone detection, and science-communication depth.
 See the script's module docstring for reproduction commands.
 

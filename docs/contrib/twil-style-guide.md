@@ -22,8 +22,7 @@ sidebar_position: 12
 
 ## 计量分析脚本 {/* #analysis-tooling */}
 
-本风格指南基于 [`scripts/analyze-newsletter.py`](../../scripts/analyze-newsletter.py)
-的计量结果编写。该脚本解析全部周报，输出每条目的字数、句数、超链接挂载于动词上的比例、编辑语气检测、科普深度等指标。复现命令见脚本顶部的文档字符串。
+本风格指南基于本项目仓库中 `scripts/analyze-newsletter.py` 的计量结果编写。该脚本解析全部周报，输出每条目的字数、句数、超链接挂载于动词上的比例、编辑语气检测、科普深度等指标。复现命令见脚本顶部的文档字符串。
 
 ## 简明性 {/* #brevity */}
 
