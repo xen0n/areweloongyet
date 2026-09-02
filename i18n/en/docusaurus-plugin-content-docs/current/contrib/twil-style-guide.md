@@ -93,6 +93,30 @@ The following verbs most frequently carry the inline link in published items:
 (In the Chinese source text these all carry the perfective suffix `了`, the
 equivalent of past/completed tense.)
 
+### Verb specificity
+
+`增加` and `添加` are both highly abstract descriptions of action that convey
+nothing about what the contributor actually did. When editors come across
+these two verbs, they should **prefer replacing them with more specific
+verbs**; fall back to `增加` only when no suitable alternative exists.
+
+Recommended replacement directions:
+
+| Actual action | Preferred verb |
+|---|---|
+| Implemented support for some hardware / driver / subsystem | `实现了`, `引入了` |
+| Implemented some feature | `实现了`, `提供了` |
+| Enabled / opened up some config option or capability | `启用了`, `打开了` |
+| Wrote new tests or documentation | `编写了` |
+| Ported / adapted support for some architecture | `移植了`, `引入了` |
+| Extended / generalized an existing feature | `扩展了`, `泛化了` |
+| Cannot be classified into any of the above | `增加了` (fallback) |
+
+This rule also applies to variants such as `新增了`. Note that `提交了` only
+describes the action of "sending out patches"; it must not be conflated with
+"the code has been merged" — if a patch has been merged into mainline, prefer
+`合并了` or the corresponding specific verb.
+
 ### Tense
 
 - **Past/completed** (verb + 了) dominates news-reporting items — natural for
@@ -305,6 +329,16 @@ right and carry practical value for downstream distribution maintainers:
   adjustments, etc.) still follow the regular granularity rule and do not
   constitute reportable items.
 
+:::info[Terminology note]
+
+Within AWLY/TWiL, "backport" should be uniformly rendered in Chinese as
+「向后移植」 rather than 「回合」. The more common reading of 「回合」 is
+「轮次」 (n. turn), which becomes ambiguous in backport contexts. Verb usage:
+`向后移植（backport）`; noun usage: `向后移植（backported）补丁`. See the
+natural language style guide at `natlang-style-guide.md`.
+
+:::
+
 ## Adapting contributions from other newsletters
 
 Contributors (including new editors) may simultaneously write for other
@@ -323,7 +357,7 @@ copy may systematically diverge from TWiL style:
 | **Review cycles** | Track full v1→review→v2→review→v3 arcs | Apply [patchset reporting granularity](#patchset-reporting-granularity): keep only the latest revision with significant changes; drop entirely if no significant change |
 | **Term explanations** | `PR_SET_SYSCALL_USER_DISPATCH (a Linux prctl operation that…)` | Delete the parenthetical. If a concept genuinely needs explanation for TWiL readers, expand it into a `:::info` block |
 | **Item coverage** | Exhaustive lists (e.g., every single Box64 PR — 11 items) | Curate to 2-3 highlights; summarise or omit the rest |
-| **Verb choice** | `添加了` (added) | Replace with `增加了` (TWiL prefers the more abstract form) |
+| **Verb choice** | `添加了` (added) | Replace with a more specific verb first (`实现了`, `启用了`, `引入了`, etc.); use `增加了` only when no suitable replacement exists. See [verb specificity](#verb-specificity) |
 | **Editorial voice** | Neutral, cold, no commentary | If something merits commentary, add a `:::info` block or a brief *this means…* sentence; otherwise do not force it |
 
 ### Adaptation checklist
@@ -349,7 +383,9 @@ newsletter, apply the following steps:
 4. **Trim exhaustive lists**: Reduce long itemised lists (e.g., every commit
    from a single project) to 2-3 highlights.
 5. **Normalize terminology**: Check and replace wording that deviates from the
-   style guide (e.g., `添加` → `增加`).
+   style guide. In particular, replace the abstract `添加`/`增加` with more
+   specific verbs (e.g., `实现了`, `启用了`, `引入了`); keep `增加` only when no
+   suitable replacement exists. See [verb specificity](#verb-specificity).
 6. **Verify section coverage**: Confirm that all mandatory sections
    (`先「马」再看`, `杂闻播报`, `张贴栏`) are covered. The
    `社区整活:儿:` (community fun) section is optional — omit if nothing
