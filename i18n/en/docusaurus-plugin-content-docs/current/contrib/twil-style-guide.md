@@ -11,24 +11,18 @@ newsletter, based on quantitative and qualitative analysis of all 54 issues
 (~1,836 news items) through early 2025. Style evolves over time; this document
 reflects the established patterns as observed.
 
-:::info[Linguistic scope: the Chinese edition]
+All discussion and decisions in this document that touch on natural-language
+phenomena, such as sentence patterns, wording, and pragmatics, apply only to
+writing and reviewing content in Simplified Chinese (the `zh-Hans` locale),
+because as of 2026 TWiL exists only in Simplified Chinese. Should TWiL gain
+translations or original content in other languages in the future, discussion
+and decisions about sentence patterns, wording, and pragmatics for those
+languages will be supplemented then, in a separate effort, into the Natural
+Language Style Guide applicable to them, as well as into this document.
 
-The **language-specific rules** in this document — the reporting template with
-its perfective-verb marking, the lists of preferred central verbs and editorial
-phrasings, temporal-adverbial patterns, and quantitative metrics such as item
-length — are derived from, and apply to, the **Simplified Chinese edition** of
-TWiL, currently the only published edition (see [analysis
-tooling](#analysis-tooling)). They apply when writing and reviewing Chinese
-copy, not to TWiL editions in other languages.
-
-This document does not prescribe linguistic treatment for TWiL in other
-locales (e.g., a future English edition); such treatment is reserved for style
-guidance to be drawn up separately for each of those editions.
-Language-independent rules in this document (e.g., reporting principles,
-science-communication depth) are unaffected by this scope limitation and apply
-to editions in any language.
-
-:::
+All other normative content in this document, such as reporting principles
+and science-communication depth, is unrelated to any natural language and
+therefore applies to all present and future language editions of TWiL.
 
 :::info[Intended audience]
 
