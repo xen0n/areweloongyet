@@ -59,8 +59,8 @@ and science communication.
    7. Run the full JSON dump once with:
       python scripts/analyze-newsletter.py > /tmp/analysis.json
       Then write a small Python snippet to compute:
-      - word-count bucket distribution (1–20, 21–40, 41–60, 61–80, 81–100,
-        101–150, 151–200, 200+)
+      - word-count bucket distribution (1-20, 21-40, 41-60, 61-80, 81-100,
+        101-150, 151-200, 200+)
       - sentence-count distribution (1, 2, 3, ..., 10+)
       - items-per-issue min/max/mean/median/stdev
 
@@ -110,7 +110,7 @@ Classification methodology
 **Explanation depth** is scored by counting regex matches against seven
 categories of "why/how" discourse markers (cause, consequence, purpose,
 contrast, temporal, definition, modality). Thresholds: 0 → none, 1 →
-slight, 2–3 → moderate, 4+ → detailed.
+slight, 2-3 → moderate, 4+ → detailed.
 
 **Editorial detection** uses a keyword list: 笔者认为, 道歉, 吐槽,
 无可厚非, 感谢, 辛苦了, 期待, etc.
@@ -129,7 +129,7 @@ Caveats
   sentences with only commas are counted as 1.
 - Word counting treats each CJK character as 1 word plus each space-delimited
   non-CJK token as 1 word. This is a rough heuristic; Chinese "words" are
-  often 1–2 characters.
+  often 1-2 characters.
 - Explanation depth is a heuristic; a score of 4+ does not guarantee the
   explanation is *correct* or *complete*, only that it contains many
   explanatory discourse markers.

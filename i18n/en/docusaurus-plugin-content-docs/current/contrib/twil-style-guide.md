@@ -39,7 +39,7 @@ See the script's module docstring for reproduction commands.
 | Median words / item | ~35 |
 | Mean sentences / item | 1.5 |
 | Exactly 1 sentence | 66.1% |
-| 1–2 sentences | 87.6% |
+| 1-2 sentences | 87.6% |
 
 The vast majority of items are **one or two sentences**. If an item exceeds
 3 sentences, consider splitting (if readability permits) or verify that it
@@ -47,13 +47,13 @@ truly forms an indivisible reporting unit.
 
 ### Rules of thumb
 
-- Routine news items: target **1–2 sentences**, **20–80 words**.
-- Supplementary explanation (background, rationale, impact): add 1–2 more
+- Routine news items: target **1-2 sentences**, **20-80 words**.
+- Supplementary explanation (background, rationale, impact): add 1-2 more
   sentences; keep the total under 5 sentences.
-- Bullet items are typically shorter (30–40 words); suitable for list-style
+- Bullet items are typically shorter (30-40 words); suitable for list-style
   browsing.
-- Regular weekly issues average 25–50 items; omnibus issues can contain
-  60–190 items.
+- Regular weekly issues average 25-50 items; omnibus issues can contain
+  60-190 items.
 
 ## Sentence construction
 
@@ -149,7 +149,7 @@ Based on automated classification of 1,836 items:
 |---|---|---|
 | None (pure reporting) | 1,226 | 66.8% |
 | Slight (1 explanatory cue) | 337 | 18.3% |
-| Moderate (2–3 cues) | 201 | 10.9% |
+| Moderate (2-3 cues) | 201 | 10.9% |
 | Detailed (4+ cues) | 72 | 3.9% |
 
 The explanation rate shows an upward trend: 28.0% (2023) → 38.7% (2024) →
@@ -180,9 +180,9 @@ The following topics are typically reported **without** explanation:
 When explanation is warranted, follow a **three-part structure**:
 
 1. **Fact** (1 sentence, past tense): X \[did\](link) Y.
-2. **Why it matters / how it works** (1–3 sentences, present tense): This was
+2. **Why it matters / how it works** (1-3 sentences, present tense): This was
    necessary because Z. This means…
-3. **Impact / takeaway** (0–1 sentence): Therefore, users should… / This enables…
+3. **Impact / takeaway** (0-1 sentence): Therefore, users should… / This enables…
 
 ### Quantifying explanation depth
 
@@ -199,7 +199,7 @@ depth:
 | **Definition** | 是一种、指的是、对应、等同于、相当于 |
 | **Modality** | 需要、要求、必须、应该、可以 |
 
-Count ≥ 4 → detailed; 2–3 → moderate; 1 → slight; 0 → pure reporting.
+Count ≥ 4 → detailed; 2-3 → moderate; 1 → slight; 0 → pure reporting.
 
 ## Examples
 
@@ -322,7 +322,7 @@ copy may systematically diverge from TWiL style:
 |---|---|---|
 | **Review cycles** | Track full v1→review→v2→review→v3 arcs | Apply [patchset reporting granularity](#patchset-reporting-granularity): keep only the latest revision with significant changes; drop entirely if no significant change |
 | **Term explanations** | `PR_SET_SYSCALL_USER_DISPATCH (a Linux prctl operation that…)` | Delete the parenthetical. If a concept genuinely needs explanation for TWiL readers, expand it into a `:::info` block |
-| **Item coverage** | Exhaustive lists (e.g., every single Box64 PR — 11 items) | Curate to 2–3 highlights; summarise or omit the rest |
+| **Item coverage** | Exhaustive lists (e.g., every single Box64 PR — 11 items) | Curate to 2-3 highlights; summarise or omit the rest |
 | **Verb choice** | `添加了` (added) | Replace with `增加了` (TWiL prefers the more abstract form) |
 | **Editorial voice** | Neutral, cold, no commentary | If something merits commentary, add a `:::info` block or a brief *this means…* sentence; otherwise do not force it |
 
@@ -347,7 +347,7 @@ newsletter, apply the following steps:
    genuinely needs a science-communication treatment for the TWiL audience,
    expand it into a standalone `:::info` block instead.
 4. **Trim exhaustive lists**: Reduce long itemised lists (e.g., every commit
-   from a single project) to 2–3 highlights.
+   from a single project) to 2-3 highlights.
 5. **Normalize terminology**: Check and replace wording that deviates from the
    style guide (e.g., `添加` → `增加`).
 6. **Verify section coverage**: Confirm that all mandatory sections
@@ -355,7 +355,7 @@ newsletter, apply the following steps:
    `社区整活:儿:` (community fun) section is optional — omit if nothing
    sufficiently interesting happened this week.
 7. **Supplement editorial commentary** (as needed): If the issue contains
-   topics worth a deeper dive, add 1–2 `:::info` blocks. If there are
+   topics worth a deeper dive, add 1-2 `:::info` blocks. If there are
    contributors worth thanking or code-quality observations worth making, use
    the established editorial markers. Do not force it — a more reportorial
    issue is preferable to one with contrived personality.
