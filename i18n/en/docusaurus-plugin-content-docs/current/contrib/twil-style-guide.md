@@ -70,11 +70,13 @@ truly forms an indivisible reporting unit.
 
 News-reporting items almost universally follow this pattern:
 
-> **Actor** `[`**action-verb** + perfective`](`link`)` **object / context**
+```markdown
+**Actor** `[`**action-verb** + perfective`](`link`)` **object / context**
+```
 
 Examples (translated from Chinese originals):
 
-```
+```markdown
 Huacai Chen [submitted](https://lore.kernel.org/...) a cpufreq driver for
 Loongson 3 processors.
 Xi Ruoyao [fixed](https://gcc.gnu.org/...) several issues in the LoongArch
@@ -386,7 +388,7 @@ See the natural language style guide at `natlang-style-guide.md`.
 
 :::
 
-## Rewriting contributions from other newsletters {/* #rewriting-contributions-from-other-newsletters */}
+## Adapting contributions from other newsletters {/* #adapting-contributions-from-other-newsletters */}
 
 Contributors (including new editors) sometimes also write for other
 LoongArch newsletters. Those newsletters serve different audiences, so the

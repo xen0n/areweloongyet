@@ -54,11 +54,13 @@ sidebar_position: 12
 
 报道类条目几乎全部遵循以下模板：
 
-> **动作发出者** `[`**动作动词**+了`](`链接`)` **对象/补充说明**
+```markdown
+**动作发出者** `[`**动作动词**+了`](`链接`)` **对象/补充说明**
+```
 
 示例：
 
-```
+```markdown
 Huacai Chen [发出了](https://lore.kernel.org/...) 适用于龙芯 3 号处理器的自动调频驱动。
 Xi Ruoyao [修复了](https://gcc.gnu.org/...) LoongArch 硬件断点的几个实现问题。
 Bibo Mao [实现了](https://lore.kernel.org/...) KVM 半虚拟化快速自旋锁。
@@ -137,7 +139,7 @@ Bibo Mao [实现了](https://lore.kernel.org/...) KVM 半虚拟化快速自旋�
 - **引用声明**：如版权合理使用声明
 - `:::tip` 块用于轻松的花絮或小知识
 
-### 规范 {/* #rules-of-thumb */}
+### 指导原则 {/* #rules-of-thumb */}
 
 - 编辑语气应**自然、有节制**。不要给每一条都评论。
 - `:::info` 块应有明确标题（使用 `:::info[标题]` 的语法），其内容应相对独立。
@@ -297,7 +299,7 @@ AI 智能体在处理无链接的报道条目时：
 
 :::
 
-## 改写来自其他通讯的投稿 {/* #rewriting-contributions-from-other-newsletters */}
+## 改写来自其他通讯的投稿 {/* #adapting-contributions-from-other-newsletters */}
 
 有时贡献者（包括新编辑）可能同时为其他 LoongArch 通讯供稿。这些通讯的读者群体不同，
 导致原始稿件的风格可能与 TWiL 存在系统性差异：
