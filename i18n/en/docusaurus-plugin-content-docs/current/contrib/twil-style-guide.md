@@ -11,6 +11,25 @@ newsletter, based on quantitative and qualitative analysis of all 54 issues
 (~1,836 news items) through early 2025. Style evolves over time; this document
 reflects the established patterns as observed.
 
+:::info[Linguistic scope: the Chinese edition]
+
+The **language-specific rules** in this document — the reporting template with
+its perfective-verb marking, the lists of preferred central verbs and editorial
+phrasings, temporal-adverbial patterns, and quantitative metrics such as item
+length — are derived from, and apply to, the **Simplified Chinese edition** of
+TWiL, currently the only published edition (see [analysis
+tooling](#analysis-tooling)). They apply when writing and reviewing Chinese
+copy, not to TWiL editions in other languages.
+
+This document does not prescribe linguistic treatment for TWiL in other
+locales (e.g., a future English edition); such treatment is reserved for style
+guidance to be drawn up separately for each of those editions.
+Language-independent rules in this document (e.g., reporting principles,
+science-communication depth) are unaffected by this scope limitation and apply
+to editions in any language.
+
+:::
+
 :::info[Intended audience]
 
 This document is for both **human editors** and **AI agent collaborators**
