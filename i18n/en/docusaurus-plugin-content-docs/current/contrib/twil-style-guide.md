@@ -21,7 +21,7 @@ This document is for both **human editors** and **AI agent collaborators**
 
 :::
 
-## Analysis tooling
+## Analysis tooling {/* #analysis-tooling */}
 
 This style guide is derived from metrics produced by
 [`scripts/analyze-newsletter.py`](../../scripts/analyze-newsletter.py). The
@@ -29,9 +29,9 @@ script parses all newsletter issues and outputs per-item word/sentence counts,
 verb-on-link ratios, editorial-tone detection, and science-communication depth.
 See the script's module docstring for reproduction commands.
 
-## Brevity
+## Brevity {/* #brevity */}
 
-### Item length
+### Item length {/* #item-length */}
 
 | Statistic | Value |
 |---|---|
@@ -45,7 +45,7 @@ The vast majority of items are **one or two sentences**. If an item exceeds
 3 sentences, consider splitting (if readability permits) or verify that it
 truly forms an indivisible reporting unit.
 
-### Rules of thumb
+### Rules of thumb {/* #rules-of-thumb */}
 
 - Routine news items: target **1-2 sentences**, **20-80 words**.
 - We trust our readers to have basic development skills and to be able to look
@@ -64,9 +64,9 @@ truly forms an indivisible reporting unit.
 - Regular weekly issues average 25-50 items; omnibus issues can contain
   60-190 items.
 
-## Sentence construction
+## Sentence construction {/* #sentence-construction */}
 
-### Dominant template
+### Dominant template {/* #dominant-template */}
 
 News-reporting items almost universally follow this pattern:
 
@@ -83,7 +83,7 @@ Bibo Mao [implemented](https://lore.kernel.org/...) paravirtualized qspinlock
 for LoongArch KVM.
 ```
 
-### Link placement
+### Link placement {/* #link-placement */}
 
 - **55.3% of links are attached directly to the central verb of the
   sentence** — this is the defining stylistic signature.
@@ -92,7 +92,7 @@ for LoongArch KVM.
 - When writing content, always prefer attaching the hyperlink to the central
   verb of the sentence.
 
-### Frequently linked central verbs
+### Frequently linked central verbs {/* #frequently-linked-central-verbs */}
 
 The 10 central verbs that most frequently carry attached links in published
 content are:
@@ -104,7 +104,7 @@ content are:
 (In the Chinese source text these all carry the perfective suffix `了`, the
 equivalent of past/completed tense.)
 
-### Verb specificity
+### Verb specificity {/* #verb-specificity */}
 
 `增加` and `添加` are both highly abstract descriptions of action that convey
 nothing about what the contributor actually did. When you come across these
@@ -137,7 +137,7 @@ mainline", prefer wording such as `合并了`.
 
 :::
 
-### Verb aspect and temporal adverbials
+### Verb aspect and temporal adverbials {/* #verb-aspect-and-temporal-adverbials */}
 
 - The vast majority of reported events have already concluded, so the most
   natural choice is the **perfective aspect** (verb + `了`).
@@ -150,9 +150,9 @@ mainline", prefer wording such as `合并了`.
 - Items in Markdown lists sometimes omit the sentence-final period, but they
   still retain the perfective marker `了`.
 
-## Editorial commentary
+## Editorial commentary {/* #editorial-commentary */}
 
-### When to comment
+### When to comment {/* #when-to-comment */}
 
 Roughly 10% of items carry explicit editorial commentary (excluding standalone
 `:::info` blocks). Commentary appears in the following situations:
@@ -167,7 +167,7 @@ Roughly 10% of items carry explicit editorial commentary (excluding standalone
 | Code-quality judgments | `不可接受`, `遑论`, `优雅不能当饭吃` |
 | Editor-in-chief commentary | Dedicated remarks on ABI decisions, toolchain changes |
 
-### `:::info` block usage
+### `:::info` block usage {/* #info-block-usage */}
 
 - **Technical deep dives**: explain *how* a mechanism works (e.g., linker
   relaxation internals)
@@ -178,7 +178,7 @@ Roughly 10% of items carry explicit editorial commentary (excluding standalone
 - **Citation notices**: e.g., fair-use declarations
 - `:::tip` blocks are used for lighthearted trivia or tips
 
-### Rules of thumb
+### Rules of thumb {/* #rules-of-thumb */}
 
 - Editorial voice should feel **natural and restrained**. Do not comment on
   every item.
@@ -188,9 +188,9 @@ Roughly 10% of items carry explicit editorial commentary (excluding standalone
   format, in a formal, accountable tone and wording.
 - Gratitude should be sincere and concise; avoid hyperbole.
 
-## Science communication
+## Science communication {/* #science-communication */}
 
-### Current distribution
+### Current distribution {/* #current-distribution */}
 
 Based on automated classification of 1,836 items:
 
@@ -204,7 +204,7 @@ Based on automated classification of 1,836 items:
 The explanation rate shows an upward trend: 28.0% (2023) → 38.7% (2024) →
 40.3% (2025, early data).
 
-### Topics that warrant explanation
+### Topics that warrant explanation {/* #topics-that-warrant-explanation */}
 
 The following topics are usually accompanied by in-depth explanation:
 
@@ -224,7 +224,7 @@ The following topics are typically reported **without** explanation:
 - Most individual patches, whether to LLVM or other projects
 - Less serious content: `社区整活:儿:` (community fun), game testing, etc.
 
-### Recommended explanation structure
+### Recommended explanation structure {/* #recommended-explanation-structure */}
 
 When explanation is warranted, follow a **three-part structure**:
 
@@ -234,7 +234,7 @@ When explanation is warranted, follow a **three-part structure**:
    was necessary because Z. This means…
 3. **Impact / takeaway** (0-1 sentence): Therefore, users should… / This enables…
 
-### Quantifying explanation depth
+### Quantifying explanation depth {/* #quantifying-explanation-depth */}
 
 The analysis script estimates explanation depth by counting the number of
 characteristic marker words detected. There are seven categories of markers:
@@ -256,23 +256,23 @@ characteristic marker words detected. There are seven categories of markers:
 | 1 | Slight |
 | 0 | Pure reporting |
 
-## Examples
+## Examples {/* #examples */}
 
-### Pure reporting
+### Pure reporting {/* #pure-reporting */}
 
 ```markdown
 Tiezhu Yang [fixed](https://lore.kernel.org/...) some details in the handling
 of the TIF_LOAD_WATCH thread flag for userspace watchpoints.
 ```
 
-### Slight explanation
+### Slight explanation {/* #slight-explanation */}
 
 ```markdown
 Hui Li [fixed](https://lore.kernel.org/...) several issues in the LoongArch
 hardware breakpoint implementation.
 ```
 
-### Moderate explanation
+### Moderate explanation {/* #moderate-explanation */}
 
 ```markdown
 On July 5, Sui Jingfeng [merged](https://cgit.freedesktop.org/...) the
@@ -282,16 +282,16 @@ graphics users should be able to light up a display with upstream kernels going
 forward; 2D/3D acceleration is separate work.
 ```
 
-### Detailed explanation + editorial commentary
+### Detailed explanation + editorial commentary {/* #detailed-explanation-editorial-commentary */}
 
 See the `:::info` blocks throughout the newsletter archives for extended
 discussions of linker relaxation, ABI design decisions, ISA encoding analysis,
 and similar deep topics. These are typically placed in standalone callout
 blocks rather than inline in reporting items.
 
-## Reporting principles
+## Reporting principles {/* #reporting-principles */}
 
-### Provenance links
+### Provenance links {/* #provenance-links */}
 
 **Every TWiL news item must carry at least one source link.** This allows
 readers to verify and explore items independently, and supports future
@@ -329,7 +329,7 @@ When an AI agent is handling a news item without source links:
 
 :::
 
-### Patchset reporting granularity
+### Patchset reporting granularity {/* #patchset-reporting-granularity */}
 
 Patchsets are the primary source of Linux kernel and toolchain news. To
 ensure that readers can scan the content efficiently, please:
@@ -358,7 +358,7 @@ collapsed to **at most one sentence** (if the latest revision is a major
 change) or **removed entirely** (if the latest change is yet another trivial
 revision).
 
-#### Special handling for backport patchsets
+#### Special handling for backport patchsets {/* #special-handling-for-backport-patchsets */}
 
 Backport patchsets are an exception to the rule above. Although their patches
 are related in content to previously reported ones, they are **standalone
@@ -386,7 +386,7 @@ See the natural language style guide at `natlang-style-guide.md`.
 
 :::
 
-## Rewriting contributions from other newsletters
+## Rewriting contributions from other newsletters {/* #rewriting-contributions-from-other-newsletters */}
 
 Contributors (including new editors) sometimes also write for other
 LoongArch newsletters. Those newsletters serve different audiences, so the
@@ -401,7 +401,7 @@ style of the raw copy may systematically diverge from TWiL's:
   follow links or look up background knowledge on its own. Each item should
   be relatively self-contained and scannable.
 
-### Common divergences and how to handle them
+### Common divergences and how to handle them {/* #common-divergences-and-how-to-handle-them */}
 
 | Divergence | Other newsletter style | TWiL treatment |
 |---|---|---|
@@ -411,7 +411,7 @@ style of the raw copy may systematically diverge from TWiL's:
 | **Verb choice** | `添加了` (added) | Replace with a more specific verb first (`实现了`, `启用了`, `引入了`, etc.); use `增加了` only when no suitable replacement exists. See [verb specificity](#verb-specificity) |
 | **Editorial voice** | Neutral, cold, no commentary | If something merits commentary, add a `:::info` block or a brief *this means…* sentence; otherwise do not force it |
 
-### Style adaptation checklist
+### Style adaptation checklist {/* #style-adaptation-checklist */}
 
 When receiving raw copy written for (or influenced by the style of) another
 newsletter, apply the following steps:
